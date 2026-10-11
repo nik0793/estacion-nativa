@@ -76,8 +76,14 @@ text, letters, watermark, logo, signature, people faces close-up, pigeon, sparro
 
 ## 4. Orden de producción
 
-**Esta noche (con estas cinco la web y la presentación quedan completas):** 03 → 01 → 02 → 04 → 07.
-**Después:** 12, 09, 08, 10, 05, 06, 13, 11, 14.
+**Estado al 11/10/2026 (noche):**
+
+- Listas y publicadas: 01 hero, 02 estanque, 03 explotada, 04 percha, 05 maestra, 09 árboles, 14 isotipo (ya es el ícono de la web). Además `extra-estanque-ceibo`, que se usa de relleno donde falta la 08.
+- **Rehacer 08 (tablero web):** salió con el nombre "Vida Silvestre" en el encabezado, que es una fundación real. Agregar al prompt: *"The site header must read exactly 'Estación Nativa' and nothing else; no other brand or organization names anywhere."* Hasta entonces quedó apartada como `_08-web-revisar-dice-vida-silvestre.png`.
+- Opcional, 03: muestra una tarjeta microSD y el diseño final no la usa (las fotos van en la memoria interna). Si la regenerás, agregar *"no memory card"*.
+- Faltan: 07 app, 12 antes y después, 10 infografía, 06 agua y comida, 13 cartel, 11 alumnos.
+
+**Orden sugerido para lo que falta:** 07 → 12 → 08 (rehecha) → 10 → 06 → 13 → 11.
 
 | Nº | Archivo | Formato | Dónde se usa |
 |---|---|---|---|

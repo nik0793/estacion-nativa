@@ -20,6 +20,13 @@ New-Item -ItemType Directory -Force (Join-Path $root "imagenes\renders") | Out-N
 Copy-Item (Join-Path $root "imagenes\dispositivos\*") (Join-Path $root "web\img\dispositivos\") -Force
 Copy-Item (Join-Path $root "imagenes\renders\*") (Join-Path $root "web\img\renders\") -Force -ErrorAction SilentlyContinue
 
+# 1b. Miniaturas JPEG de las fotos de componentes (los PDF las usan para pesar poco)
+try {
+    & python -I (Join-Path $root "herramientas\miniaturas.py") (Join-Path $root "imagenes\dispositivos") (Join-Path $root "imagenes\dispositivos\mini") 600
+    # 1c. Los renders PNG se convierten a JPEG (máx. 1600 px) para la web y la presentación
+    & python -I (Join-Path $root "herramientas\miniaturas.py") (Join-Path $root "imagenes\renders") (Join-Path $root "imagenes\renders") 1600
+} catch { Write-Host "  (sin Python/Pillow: faltan las versiones JPEG)" }
+
 $comunes = @("--headless=new", "--disable-gpu", "--hide-scrollbars", "--run-all-compositor-stages-before-draw", "--user-data-dir=`"$perfil`"")
 
 # 2. Captura de la web para la presentación

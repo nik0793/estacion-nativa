@@ -23,11 +23,15 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - name: Convertir los renders PNG a JPEG liviano
+        run: |
+          python3 -m pip install --quiet pillow
+          if [ -d imagenes/renders ]; then python3 herramientas/miniaturas.py imagenes/renders imagenes/renders 1600; fi
       - name: Armar la carpeta publicable (web + imágenes)
         run: |
           mkdir -p web/img/dispositivos web/img/renders
           cp -r imagenes/dispositivos/. web/img/dispositivos/
-          if [ -d imagenes/renders ]; then cp -r imagenes/renders/. web/img/renders/; fi
+          if [ -d imagenes/renders ]; then cp imagenes/renders/*.jpg web/img/renders/ 2>/dev/null || true; fi
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

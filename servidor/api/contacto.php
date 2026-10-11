@@ -11,7 +11,8 @@ if ($origen !== '' && in_array($origen, preg_split('/\s+/', ORIGENES_WEB), true)
     header('Access-Control-Allow-Headers: Content-Type');
 }
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
-if ($_SERVER['REQUEST_METHOD'] === 'HEAD') { http_response_code(200); exit; }
+// HEAD y GET sirven de comprobación para la web (algunos servidores entregan HEAD a PHP como GET)
+if ($_SERVER['REQUEST_METHOD'] === 'HEAD' || $_SERVER['REQUEST_METHOD'] === 'GET') responder(200, ['ok' => true, 'formulario' => 'activo']);
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') responder(405, ['ok' => false]);
 
 $d = $_POST;

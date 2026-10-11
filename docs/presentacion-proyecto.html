@@ -32,7 +32,7 @@
   figure { margin: 0; }
   figure img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 5mm; }
   figure.foto { height: 150mm; }
-  figure.falta { border: 2px dashed var(--naranja); border-radius: 5mm; background: repeating-linear-gradient(45deg, #fff8ef, #fff8ef 6mm, #fdf1e3 6mm, #fdf1e3 12mm); display: grid; place-items: center; color: var(--naranja); font-weight: 600; text-align: center; padding: 10mm; font-size: 10pt; }
+  figure.falta { border: 2px dashed var(--naranja); border-radius: 5mm; background: #fbf3e8; display: grid; place-items: center; color: var(--naranja); font-weight: 600; text-align: center; padding: 10mm; font-size: 10pt; }
   figure.falta::after { content: attr(data-falta); }
   ul.lista { padding-left: 0; list-style: none; margin: 0 0 3mm; }
   ul.lista li { padding-left: 7mm; position: relative; margin-bottom: 2.2mm; font-size: 10.5pt; line-height: 1.4; }
@@ -52,9 +52,9 @@
   .portada { display: flex; flex-direction: column; justify-content: flex-end; }
   .portada .fondo { position: absolute; inset: 0; }
   .portada .fondo img { width: 100%; height: 100%; object-fit: cover; }
-  .portada .fondo.falta { border: none; background: linear-gradient(160deg, #143f27, #1f5e3a 60%, #2c7a4f); color: rgba(255,255,255,.55); }
-  .portada .velo { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,63,39,0) 30%, rgba(20,63,39,.88) 75%); }
-  .portada .texto { position: relative; color: #fff; }
+  .portada .fondo.falta { border: none; background: #1a4d31; color: rgba(255,255,255,.55); }
+  .portada .velo { display: none; }
+  .portada .texto { position: relative; color: #fff; background: rgba(20,63,39,.82); padding: 10mm 12mm 9mm; border-radius: 5mm; max-width: 215mm; }
   .portada h1 { color: #fff; font-size: 44pt; max-width: 200mm; }
   .portada p { color: #efe9dc; font-size: 13pt; max-width: 170mm; }
   .fase { border-top: 3px solid var(--naranja); padding-top: 3mm; }
@@ -70,7 +70,7 @@
 <!-- 1 PORTADA -->
 <div class="lamina portada">
   <figure class="fondo" data-falta="Render 01 · hero (docs/prompts-imagenes.md)">
-    <img src="../imagenes/renders/01-hero.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+    <img src="../imagenes/renders/01-hero.jpg" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
   </figure>
   <div class="velo"></div>
   <div class="texto">
@@ -91,7 +91,7 @@
       <p>Buenos Aires figura entre las tres provincias con más especies de vertebrados amenazadas del país.</p>
     </div>
     <figure class="foto" style="height:120mm" data-falta="Render 12 · antes y después (campo pelado / bosque nativo con aves)">
-      <img src="../imagenes/renders/12-antes-despues.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+      <img src="../imagenes/renders/12-antes-despues.jpg" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
     </figure>
   </div>
   <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>2</span></div>
@@ -124,7 +124,7 @@
       </ul>
     </div>
     <figure class="foto" data-falta="Render 04 · cardenal en la percha frente a la cámara">
-      <img src="../imagenes/renders/04-percha.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+      <img src="../imagenes/renders/04-percha.jpg" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
     </figure>
   </div>
   <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>4</span></div>
@@ -162,7 +162,7 @@
 <div class="lamina">
   <div class="dos">
     <figure class="foto" data-falta="Render 02 · el sector estanque con cuatro estaciones y la maestra">
-      <img src="../imagenes/renders/02-estanque.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+      <img src="../imagenes/renders/02-estanque.jpg" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
     </figure>
     <div>
       <div class="ojo">El sector estanque</div>
@@ -186,12 +186,12 @@
   <h2>Piezas de catálogo, planos y código abiertos.</h2>
   <p style="max-width:230mm;opacity:.9">Nada a medida: cada componente se compra en MercadoLibre y se reemplaza en una tarde. Los planos de la caja, los esquemas, el firmware y el servidor se publican con licencias abiertas (MIT y CERN-OHL) para que cualquier escuela técnica pueda armar su propio sector.</p>
   <div class="piezas">
-    <div class="pieza"><img src="../imagenes/dispositivos/esp32-cam.webp" alt=""><span>ESP32-CAM · 24.559 $</span></div>
-    <div class="pieza"><img src="../imagenes/dispositivos/panel-solar-6v-1_5w.webp" alt=""><span>Panel 6 V 1,5 W · 14.999 $</span></div>
-    <div class="pieza"><img src="../imagenes/dispositivos/bateria-18650.webp" alt=""><span>Pila 18650 · 8.000 a 26.000 $</span></div>
-    <div class="pieza"><img src="../imagenes/dispositivos/pir-hc-sr501.webp" alt=""><span>Sensor PIR · 3.229 $</span></div>
-    <div class="pieza"><img src="../imagenes/dispositivos/tp4056-boost-j5019.webp" alt=""><span>Cargador solar y fuente · 4.390 $</span></div>
-    <div class="pieza"><img src="../imagenes/dispositivos/modem-4g-usb-wifi-2.webp" alt=""><span>Módem 4G WiFi · 63.000 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/esp32-cam.jpg" alt=""><span>ESP32-CAM · 24.559 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/panel-solar-6v-1_5w.jpg" alt=""><span>Panel 6 V 1,5 W · 14.999 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/bateria-18650.jpg" alt=""><span>Pila 18650 · 8.000 a 26.000 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/pir-hc-sr501.jpg" alt=""><span>Sensor PIR · 3.229 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/tp4056-boost-j5019.jpg" alt=""><span>Cargador solar y fuente · 4.390 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/mini/modem-4g-usb-wifi-2.jpg" alt=""><span>Módem 4G WiFi · 63.000 $</span></div>
   </div>
   <table>
     <tr><th>Qué</th><th class="num">Costo todo nuevo</th><th class="num">Con pilas recuperadas</th><th>Comentario</th></tr>
@@ -219,7 +219,7 @@
       <p><b>BirdNET</b> (Cornell Lab of Ornithology y Universidad de Chemnitz) identifica especies por su canto con un modelo abierto. <b>eBird</b> recibe los registros validados. <b>Aves Argentinas</b> y los clubes de observadores de la zona validan y aportan criterio. <b>Escuelas técnicas y universidades</b> pueden usar los datos y replicar las estaciones.</p>
     </div>
     <figure class="foto" data-falta="Render 08 · tablero web con mapa, galería y especies por semana">
-      <img src="../imagenes/renders/08-web.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+      <img src="../imagenes/renders/08-web.jpg" alt="" onerror="if(!this.dataset.alt){this.dataset.alt=1;this.src='../imagenes/renders/extra-estanque-ceibo.jpg'}else{this.parentNode.classList.add('falta');this.remove()}">
     </figure>
   </div>
   <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>8</span></div>
@@ -236,7 +236,7 @@
     </div>
     <div>
       <figure class="foto" style="height:112mm" data-falta="Render 07 · la app en el celular (feed, especies, estado de las estaciones)">
-        <img src="../imagenes/renders/07-app.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+        <img src="../imagenes/renders/07-app.jpg" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
       </figure>
       <p style="font-size:9.5pt;color:var(--gris);margin-top:2mm">App para quien cuida el predio: últimas fotos, batería y agua de cada estación, dar comida, sacar una foto, cambiar horarios.</p>
     </div>

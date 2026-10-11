@@ -10,11 +10,14 @@ DEST="domains/$DOM/public_html"
 
 ssh hostinger "test -d $DEST" || { echo "No existe $DEST en el servidor. Creá el sitio en hPanel primero."; exit 1; }
 
+python -I herramientas/miniaturas.py imagenes/renders imagenes/renders 1600 2>/dev/null || echo "(sin Python/Pillow: se suben los renders que ya estén en JPEG)"
+
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 cp -r web/. "$TMP/"
+rm -rf "$TMP/img"
 mkdir -p "$TMP/img/dispositivos" "$TMP/img/renders"
-cp -r imagenes/dispositivos/. "$TMP/img/dispositivos/"
-if [ -d imagenes/renders ]; then cp -r imagenes/renders/. "$TMP/img/renders/"; fi
+cp imagenes/dispositivos/*.webp "$TMP/img/dispositivos/"
+if ls imagenes/renders/*.jpg >/dev/null 2>&1; then cp imagenes/renders/*.jpg "$TMP/img/renders/"; fi
 cp -r servidor/. "$TMP/"
 rm -f "$TMP/config.local.php"
 rm -rf "$TMP/datos" "$TMP/fotos"

@@ -13,6 +13,13 @@ firmware/**/build/
 *.bin
 *.elf
 
-# Sistema
+# Sistema y herramientas locales
 Thumbs.db
 .DS_Store
+.impeccable/
+
+# Miniaturas generadas por construir.ps1
+imagenes/dispositivos/mini/
+
+# JPEG de los renders, los genera construir.ps1 / el workflow
+imagenes/renders/*.jpg
