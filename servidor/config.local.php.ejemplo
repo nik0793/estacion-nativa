@@ -1,0 +1,6 @@
+<?php
+// Copiar como config.local.php (no se publica) y completar.
+define('CLAVE_API', 'poner-24-caracteres-al-azar');      // la misma que CLAVE_API en el firmware
+define('CLAVE_APP', 'clave-para-entrar-a-la-app');       // la que usan Iván y Nicolás en /app/
+define('CORREO_AVISOS', '');                             // opcional: correo que recibe los mensajes del formulario
+// define('ORIGENES_WEB', 'https://nik0793.github.io https://estacionnativa.com.ar');

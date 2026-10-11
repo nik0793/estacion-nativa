@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estación Nativa — Presentación del proyecto</title>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  :root { --verde:#1f5e3a; --verde-osc:#143f27; --naranja:#d9702b; --crema:#f6f1e8; --crema-2:#ece5d7; --tinta:#1b1b1b; --gris:#5f5b54; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif; color: var(--tinta); background: #888; }
+  .lamina { width: 297mm; height: 210mm; padding: 16mm 18mm 14mm; background: var(--crema); position: relative; overflow: hidden; page-break-after: always; margin: 0 auto; }
+  .lamina.oscura { background: var(--verde-osc); color: #efe9dc; }
+  .lamina.oscura h1, .lamina.oscura h2, .lamina.oscura h3 { color: #fff; }
+  .lamina.oscura .ojo { color: #f0a76a; }
+  .pie { position: absolute; left: 18mm; right: 18mm; bottom: 8mm; display: flex; justify-content: space-between; font-size: 8.5pt; color: var(--gris); }
+  .lamina.oscura .pie { color: #cfc6b4; }
+  h1, h2, h3 { font-family: Newsreader, Georgia, serif; font-weight: 700; line-height: 1.08; margin: 0 0 4mm; color: var(--verde-osc); }
+  h1 { font-size: 34pt; letter-spacing: -.01em; }
+  h2 { font-size: 24pt; }
+  h3 { font-size: 13.5pt; color: var(--verde); margin-bottom: 2mm; }
+  p { margin: 0 0 3mm; font-size: 11pt; line-height: 1.45; }
+  .ojo { font-size: 9pt; letter-spacing: .14em; text-transform: uppercase; color: var(--naranja); font-weight: 600; margin-bottom: 3mm; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 12mm; height: 100%; align-items: center; }
+  .dos.arriba { align-items: start; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; margin-top: 6mm; }
+  .cuatro { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm; margin-top: 6mm; }
+  .tarjeta { background: #fff; border-radius: 5mm; padding: 7mm; border: 1px solid var(--crema-2); }
+  .oscura .tarjeta { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.14); }
+  .tarjeta .n { font-family: Newsreader, Georgia, serif; font-size: 26pt; color: var(--naranja); line-height: 1; margin-bottom: 2mm; }
+  figure { margin: 0; }
+  figure img { width: 100%; height: 100%; object-fit: cover; display: block; border-radius: 5mm; }
+  figure.foto { height: 150mm; }
+  figure.falta { border: 2px dashed var(--naranja); border-radius: 5mm; background: repeating-linear-gradient(45deg, #fff8ef, #fff8ef 6mm, #fdf1e3 6mm, #fdf1e3 12mm); display: grid; place-items: center; color: var(--naranja); font-weight: 600; text-align: center; padding: 10mm; font-size: 10pt; }
+  figure.falta::after { content: attr(data-falta); }
+  ul.lista { padding-left: 0; list-style: none; margin: 0 0 3mm; }
+  ul.lista li { padding-left: 7mm; position: relative; margin-bottom: 2.2mm; font-size: 10.5pt; line-height: 1.4; }
+  ul.lista li::before { content: ""; position: absolute; left: 0; top: 1.6mm; width: 3.2mm; height: 3.2mm; border-radius: 50%; background: var(--naranja); }
+  .cifra b { display: block; font-family: Newsreader, Georgia, serif; font-size: 30pt; color: var(--naranja); line-height: 1; }
+  .cifra span { font-size: 10pt; }
+  table { border-collapse: collapse; width: 100%; font-size: 10pt; margin-top: 3mm; }
+  th, td { border-bottom: 1px solid var(--crema-2); padding: 2mm 2.5mm; text-align: left; vertical-align: top; }
+  th { color: var(--verde); font-weight: 600; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .oscura th, .oscura td { border-color: rgba(255,255,255,.14); }
+  .oscura th { color: #f0a76a; }
+  .piezas { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5mm; margin: 6mm 0; }
+  .pieza { background: #fff; border-radius: 4mm; padding: 3mm; text-align: center; }
+  .pieza img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+  .pieza span { display: block; font-size: 8.5pt; color: var(--gris); margin-top: 1.5mm; }
+  .portada { display: flex; flex-direction: column; justify-content: flex-end; }
+  .portada .fondo { position: absolute; inset: 0; }
+  .portada .fondo img { width: 100%; height: 100%; object-fit: cover; }
+  .portada .fondo.falta { border: none; background: linear-gradient(160deg, #143f27, #1f5e3a 60%, #2c7a4f); color: rgba(255,255,255,.55); }
+  .portada .velo { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,63,39,0) 30%, rgba(20,63,39,.88) 75%); }
+  .portada .texto { position: relative; color: #fff; }
+  .portada h1 { color: #fff; font-size: 44pt; max-width: 200mm; }
+  .portada p { color: #efe9dc; font-size: 13pt; max-width: 170mm; }
+  .fase { border-top: 3px solid var(--naranja); padding-top: 3mm; }
+  .fase b { display: block; color: var(--verde-osc); margin-bottom: 1mm; font-size: 11pt; }
+  .fase small { color: var(--naranja); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 8pt; }
+  svg text { font-family: "Source Sans 3", Arial, sans-serif; }
+  .web { height: 122mm; border-radius: 5mm; overflow: hidden; border: 1px solid var(--crema-2); background: #fff; }
+  .web img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+</style>
+</head>
+<body>
+
+<!-- 1 PORTADA -->
+<div class="lamina portada">
+  <figure class="fondo" data-falta="Render 01 · hero (docs/prompts-imagenes.md)">
+    <img src="../imagenes/renders/01-hero.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+  </figure>
+  <div class="velo"></div>
+  <div class="texto">
+    <div class="ojo" style="color:#f0a76a">Ecoestudio Solar · Del Viso, Buenos Aires · 2026</div>
+    <h1>Estación Nativa</h1>
+    <p>Tecnología abierta para medir el regreso de las aves a los bosques nativos que estamos plantando. Una propuesta para empresas, instituciones y vecinos que quieran ser parte.</p>
+  </div>
+</div>
+
+<!-- 2 PROBLEMA 1 -->
+<div class="lamina">
+  <div class="ojo">El problema · 1 de 2</div>
+  <h2>Sin monte nativo no hay aves nativas.</h2>
+  <div class="dos arriba" style="height:auto;margin-top:4mm">
+    <div>
+      <p>Los talares y montes ribereños de la provincia de Buenos Aires quedaron reducidos a franjas. La agricultura, la urbanización sin control y las especies exóticas invasoras ocuparon el resto. El ligustro, la acacia negra y la mora crecen rápido y parecen bosque, pero no son el bosque que alimenta a la fauna de la región.</p>
+      <p>Las aves nativas dependen de los árboles nativos: el tala da frutos en otoño, el ceibo néctar en verano, el espinillo insectos y espinas donde nidificar. Cuando esos árboles desaparecen, se van el zorzal, el cardenal, la calandria y el picaflor, y quedan la paloma, el gorrión y la cotorra.</p>
+      <p>Buenos Aires figura entre las tres provincias con más especies de vertebrados amenazadas del país.</p>
+    </div>
+    <figure class="foto" style="height:120mm" data-falta="Render 12 · antes y después (campo pelado / bosque nativo con aves)">
+      <img src="../imagenes/renders/12-antes-despues.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>2</span></div>
+</div>
+
+<!-- 3 PROBLEMA 2 -->
+<div class="lamina">
+  <div class="ojo">El problema · 2 de 2</div>
+  <h2>Plantar sin medir es plantar a ciegas.</h2>
+  <div class="tres">
+    <div class="tarjeta"><div class="n">?</div><h3>Nadie sabe qué vuelve</h3><p>No existen registros continuos de qué especies llegan a una plantación nueva, cuándo lo hacen ni a qué ritmo. Lo que se sabe depende de salidas esporádicas con binoculares.</p></div>
+    <div class="tarjeta"><div class="n">$</div><h3>El apoyo no se puede mostrar</h3><p>Una empresa o un municipio que financia una plantación recibe, con suerte, una foto del día de siembra. Nunca una evidencia de que el bosque funciona.</p></div>
+    <div class="tarjeta"><div class="n">⌛</div><h3>El monitoreo profesional es caro y lento</h3><p>Los estudios de biodiversidad se hacen con equipos de campo y presupuesto. Un proyecto vecinal no accede a eso, y las decisiones (qué plantar, dónde, qué cuidar) se toman sin datos.</p></div>
+  </div>
+  <p style="margin-top:8mm;font-size:12.5pt;max-width:220mm"><b>Lo que hace falta:</b> una forma barata, continua y confiable de registrar qué aves usan el lugar, que cualquiera pueda ver, y que una escuela técnica pueda replicar.</p>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>3</span></div>
+</div>
+
+<!-- 4 SOLUCIÓN -->
+<div class="lamina">
+  <div class="dos">
+    <div>
+      <div class="ojo">La solución</div>
+      <h2>Plantar nativas y medir el regreso con tecnología que cabe en una mano.</h2>
+      <p>Ecoestudio Solar planta árboles nativos en Del Viso. Estación Nativa pone, en cada sector plantado, estaciones solares que dan agua y registran a cada ave que se acerca. Todo lo que registran se publica.</p>
+      <ul class="lista">
+        <li><b>Agua.</b> Bebedero por gravedad con válvula flotante, sin energía. Es el recurso que más aves atrae, sobre todo en verano.</li>
+        <li><b>Registro.</b> Cada vez que un ave se posa, una cámara saca dos fotos con fecha, hora y lugar. En la versión 2, también graba su canto.</li>
+        <li><b>Datos abiertos.</b> Fotos, especies y horarios se publican en una web y se comparten con eBird y Aves Argentinas.</li>
+      </ul>
+    </div>
+    <figure class="foto" data-falta="Render 04 · cardenal en la percha frente a la cámara">
+      <img src="../imagenes/renders/04-percha.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>4</span></div>
+</div>
+
+<!-- 5 CÓMO FUNCIONA -->
+<div class="lamina">
+  <div class="ojo">Cómo funciona</div>
+  <h2>Duerme casi todo el día. Se despierta cuando llega un ave.</h2>
+  <svg viewBox="0 0 1000 150" width="100%" style="margin:4mm 0" xmlns="http://www.w3.org/2000/svg">
+    <defs><marker id="fl" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#d9702b"/></marker></defs>
+    <g font-size="13" fill="#1b1b1b" text-anchor="middle">
+      <circle cx="90" cy="60" r="44" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="90" y="56" font-size="26">🐦</text><text x="90" y="125">El ave se posa</text>
+      <circle cx="295" cy="60" r="44" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="295" y="66" font-size="13" font-weight="700" fill="#1f5e3a">PIR</text><text x="295" y="125">Un sensor la detecta</text>
+      <circle cx="500" cy="60" r="44" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="500" y="66" font-size="13" font-weight="700" fill="#1f5e3a">2 fotos</text><text x="500" y="125">Las guarda con fecha y hora</text>
+      <circle cx="705" cy="60" r="44" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="705" y="66" font-size="13" font-weight="700" fill="#1f5e3a">4G</text><text x="705" y="125">Una vez por hora sube todo</text>
+      <circle cx="910" cy="60" r="44" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="910" y="66" font-size="13" font-weight="700" fill="#1f5e3a">web</text><text x="910" y="125">Se publica e identifica</text>
+      <path d="M138,60 L247,60" stroke="#d9702b" stroke-width="2.5" marker-end="url(#fl)"/>
+      <path d="M343,60 L452,60" stroke="#d9702b" stroke-width="2.5" marker-end="url(#fl)"/>
+      <path d="M548,60 L657,60" stroke="#d9702b" stroke-width="2.5" marker-end="url(#fl)"/>
+      <path d="M753,60 L862,60" stroke="#d9702b" stroke-width="2.5" marker-end="url(#fl)"/>
+    </g>
+  </svg>
+  <div class="cuatro" style="margin-top:2mm">
+    <div class="cifra"><b>1,5 W</b><span>de panel solar por estación, el tamaño de una postal</span></div>
+    <div class="cifra"><b>20 días</b><span>de autonomía sin sol con dos pilas 18650</span></div>
+    <div class="cifra"><b>6 min/h</b><span>de módem encendido. Es lo que más gasta, y lo comparte todo el sector</span></div>
+    <div class="cifra"><b>1 chip</b><span>prepago por sector. Único costo mensual: 3.000 a 5.000 $</span></div>
+  </div>
+  <p style="margin-top:8mm;color:var(--gris)">La identificación de especies se hace en el servidor con BirdNET, la herramienta abierta del Cornell Lab of Ornithology, y con observadores locales que validan desde la web. Las estaciones no transmiten en vivo: las órdenes (dar comida, sacar una foto, cambiar horarios) se ejecutan en la siguiente conexión.</p>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>5</span></div>
+</div>
+
+<!-- 6 SECTOR -->
+<div class="lamina">
+  <div class="dos">
+    <figure class="foto" data-falta="Render 02 · el sector estanque con cuatro estaciones y la maestra">
+      <img src="../imagenes/renders/02-estanque.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+    <div>
+      <div class="ojo">El sector estanque</div>
+      <h2>Un módem, un chip, muchas cámaras.</h2>
+      <p>Las estaciones se agrupan alrededor de un punto de interés, a pocos metros entre sí. Una de ellas lleva el módem y lo comparte por WiFi con las demás. Agregar una cámara cuesta solo la cámara.</p>
+      <ul class="lista">
+        <li><b>Todas las orillas.</b> Con cuatro cámaras no se pierde lo que pasa del otro lado del agua.</li>
+        <li><b>Identificación más confiable.</b> Dos ángulos del mismo ave en el mismo segundo; un disparo por viento no coincide con nada y se descarta solo.</li>
+        <li><b>Contar, no solo detectar.</b> Disparos simultáneos distinguen una bandada de un individuo.</li>
+        <li><b>Mapa de uso.</b> Qué especie bebe en la orilla baja, cuál se baña, cuál usa la rama alta y a qué hora.</li>
+        <li><b>Puestos especializados.</b> Percha, bebedero, comedero, y una estación con micrófono para toda la zona.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>6</span></div>
+</div>
+
+<!-- 7 TECNOLOGÍA -->
+<div class="lamina oscura">
+  <div class="ojo">Tecnología abierta y de bajo costo</div>
+  <h2>Piezas de catálogo, planos y código abiertos.</h2>
+  <p style="max-width:230mm;opacity:.9">Nada a medida: cada componente se compra en MercadoLibre y se reemplaza en una tarde. Los planos de la caja, los esquemas, el firmware y el servidor se publican con licencias abiertas (MIT y CERN-OHL) para que cualquier escuela técnica pueda armar su propio sector.</p>
+  <div class="piezas">
+    <div class="pieza"><img src="../imagenes/dispositivos/esp32-cam.webp" alt=""><span>ESP32-CAM · 24.559 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/panel-solar-6v-1_5w.webp" alt=""><span>Panel 6 V 1,5 W · 14.999 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/bateria-18650.webp" alt=""><span>Pila 18650 · 8.000 a 26.000 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/pir-hc-sr501.webp" alt=""><span>Sensor PIR · 3.229 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/tp4056-boost-j5019.webp" alt=""><span>Cargador solar y fuente · 4.390 $</span></div>
+    <div class="pieza"><img src="../imagenes/dispositivos/modem-4g-usb-wifi-2.webp" alt=""><span>Módem 4G WiFi · 63.000 $</span></div>
+  </div>
+  <table>
+    <tr><th>Qué</th><th class="num">Costo todo nuevo</th><th class="num">Con pilas recuperadas</th><th>Comentario</th></tr>
+    <tr><td>Una estación base (cámara, sensor, panel, pilas, caja)</td><td class="num">131.000 $</td><td class="num">79.000 $</td><td>Precios verificados en MercadoLibre el 11/10/2026</td></tr>
+    <tr><td>Un sector completo: 4 estaciones, módem, comedero, tanque</td><td class="num">744.000 $</td><td class="num">535.000 $</td><td>Incluye programador y chip con el primer mes</td></tr>
+    <tr><td>Costo mensual del sector</td><td class="num">3.000 a 5.000 $</td><td class="num">igual</td><td>Un chip prepago con 1 GB</td></tr>
+    <tr><td>Alternativa con placa integrada comercial (Waveshare 4G)</td><td class="num">720.000 $</td><td class="num">—</td><td>Solo las cuatro placas, más un chip por cámara. Por eso no.</td></tr>
+  </table>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>7</span></div>
+</div>
+
+<!-- 8 DATOS -->
+<div class="lamina">
+  <div class="dos">
+    <div>
+      <div class="ojo">Datos abiertos y ciencia</div>
+      <h2>Lo que vamos a aprender</h2>
+      <ul class="lista">
+        <li>Qué especies visitan cada sector, semana a semana.</li>
+        <li>A qué hora del día y en qué época del año aparecen.</li>
+        <li>Cómo cambia la lista a medida que los árboles crecen: un sector plantado hace un año contra uno de tres.</li>
+        <li>Qué recurso usa cada especie: agua, baño, percha, alimento.</li>
+      </ul>
+      <h3 style="margin-top:6mm">Con quién</h3>
+      <p><b>BirdNET</b> (Cornell Lab of Ornithology y Universidad de Chemnitz) identifica especies por su canto con un modelo abierto. <b>eBird</b> recibe los registros validados. <b>Aves Argentinas</b> y los clubes de observadores de la zona validan y aportan criterio. <b>Escuelas técnicas y universidades</b> pueden usar los datos y replicar las estaciones.</p>
+    </div>
+    <figure class="foto" data-falta="Render 08 · tablero web con mapa, galería y especies por semana">
+      <img src="../imagenes/renders/08-web.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>8</span></div>
+</div>
+
+<!-- 9 WEB Y APP -->
+<div class="lamina">
+  <div class="ojo">La web y la app</div>
+  <h2>Todo a la vista: para los vecinos, para los sponsors, para la ciencia.</h2>
+  <div class="dos arriba" style="height:auto;margin-top:2mm;grid-template-columns:1.35fr 1fr">
+    <div>
+      <div class="web"><img src="../imagenes/renders/web-captura.jpg" alt="Página web del proyecto" onerror="this.onerror=null;this.src='../imagenes/renders/web-captura.png'"></div>
+      <p style="font-size:9.5pt;color:var(--gris);margin-top:2mm">Página pública (se aloja en Hostinger): el problema, la solución, cómo funciona, galería de fotos, especies registradas y espacio para los que apoyan.</p>
+    </div>
+    <div>
+      <figure class="foto" style="height:112mm" data-falta="Render 07 · la app en el celular (feed, especies, estado de las estaciones)">
+        <img src="../imagenes/renders/07-app.png" alt="" onerror="this.parentNode.classList.add('falta');this.remove()">
+      </figure>
+      <p style="font-size:9.5pt;color:var(--gris);margin-top:2mm">App para quien cuida el predio: últimas fotos, batería y agua de cada estación, dar comida, sacar una foto, cambiar horarios.</p>
+    </div>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>9</span></div>
+</div>
+
+<!-- 10 ALCANCE -->
+<div class="lamina">
+  <div class="ojo">Alcance</div>
+  <h2>Empieza en un estanque. Puede estar en cualquier escuela, reserva o plaza.</h2>
+  <div class="tres" style="margin-top:8mm">
+    <div class="fase"><small>Fase 1 · 6 semanas</small><b>Sector estanque en Ecoestudio Solar</b><p>Cuatro estaciones, módem compartido, bebedero y comedero. Web con galería pública y primer listado de especies validado a mano.</p></div>
+    <div class="fase"><small>Fase 2 · 3 meses</small><b>Oído y más sectores</b><p>Estación con micrófono e identificación automática por BirdNET. App para el cuidado del predio. Dos sectores más en zonas plantadas en distintos años, para comparar.</p></div>
+    <div class="fase"><small>Fase 3 · primer año</small><b>Réplica y primer informe</b><p>Un sector armado por una escuela técnica y otro en un predio municipal o en una reserva. Primer informe anual de biodiversidad con datos abiertos.</p></div>
+  </div>
+  <div class="cuatro" style="margin-top:12mm">
+    <div class="cifra"><b>4</b><span>cámaras en el primer sector</span></div>
+    <div class="cifra"><b>&lt;1 M$</b><span>por sector completo, instalado</span></div>
+    <div class="cifra"><b>100 %</b><span>abierto: cualquiera lo replica</span></div>
+    <div class="cifra"><b>0</b><span>costos fijos salvo el chip</span></div>
+  </div>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>10</span></div>
+</div>
+
+<!-- 11 SPONSORS -->
+<div class="lamina oscura">
+  <div class="ojo">Cómo participar</div>
+  <h2>El proyecto no tiene presupuesto. Tiene gente.</h2>
+  <p style="max-width:230mm;opacity:.9">El diseño, el software y las horas de taller ya están aportados. Lo que falta son los componentes de cada sector y manos para plantar, instalar y etiquetar fotos. Propuesta de niveles de apoyo:</p>
+  <table>
+    <tr><th>Nivel</th><th>Aporte</th><th>Qué recibe</th></tr>
+    <tr><td><b>Estación</b></td><td>Los componentes de una estación (unos 150.000 $) o su equivalente en materiales.</td><td>Nombre en la estación y en la web, con sus fotos identificadas.</td></tr>
+    <tr><td><b>Sector</b></td><td>Un sector completo (unos 750.000 $).</td><td>Logo en el cartel del sector, en la web y en la app. Informe semestral con las fotos y las especies registradas. Participación en las jornadas de plantación con su equipo.</td></tr>
+    <tr><td><b>Bosque</b></td><td>A convenir: financia la réplica en una escuela, una plaza o una reserva.</td><td>Todo lo anterior en cada réplica, más el relato del proyecto para su comunicación.</td></tr>
+    <tr><td><b>Instituciones</b></td><td>Municipios, parques, escuelas: predio, permisos, difusión.</td><td>Un sector propio con nuestro apoyo técnico. Todo el material es abierto.</td></tr>
+    <tr><td><b>Personas</b></td><td>Tiempo.</td><td>Plantar, instalar, validar especies, armar estaciones en la escuela.</td></tr>
+  </table>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>11</span></div>
+</div>
+
+<!-- 12 EQUIPO Y CONTACTO -->
+<div class="lamina">
+  <div class="ojo">Quiénes y cómo seguir</div>
+  <h2>Equipo</h2>
+  <div class="tres">
+    <div class="tarjeta"><h3>Iván Espeche</h3><p>Ecoestudio Solar. Predio, plantación de nativas y vínculo con municipio, parque y vecinos.</p></div>
+    <div class="tarjeta"><h3>Nicolás Gutiérrez</h3><p>Diseño electrónico, firmware, servidor y app. Trabajo aportado al proyecto sin cargo.</p></div>
+    <div class="tarjeta"><h3>Escuela técnica</h3><p>Alumnos que desarrollan la versión educativa del comedero inteligente, origen de este proyecto.</p></div>
+  </div>
+  <h3 style="margin-top:10mm">Próximo paso</h3>
+  <p style="max-width:230mm">Medir la señal 4G en el estanque, comprar los componentes de la primera estación y tener en seis semanas el sector funcionando y publicando fotos. Con eso en la mano, presentar el proyecto al municipio, al parque y a las empresas de la zona.</p>
+  <p style="margin-top:8mm"><b>Web:</b> skyblue-gorilla-834934.hostingersite.com · <b>Código, planos y presupuesto:</b> github.com/nik0793/estacion-nativa · <b>Contacto:</b> formulario en la web.</p>
+  <div class="pie"><span>Estación Nativa · Ecoestudio Solar</span><span>12</span></div>
+</div>
+
+</body>
+</html>

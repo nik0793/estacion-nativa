@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Estación Nativa — Informe técnico v1</title>
+<style>
+  @page { size: A4; margin: 16mm 15mm 18mm 15mm; }
+  :root { --verde:#1f5e3a; --naranja:#d9702b; --tinta:#1b1b1b; --gris:#666; --linea:#d8d3c8; --crema:#f6f1e8; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Inter, Arial, sans-serif; color: var(--tinta); font-size: 10.5pt; line-height: 1.42; margin: 0; }
+  h1 { font-size: 26pt; margin: 0 0 4mm; color: var(--verde); line-height: 1.1; }
+  h2 { font-size: 15pt; color: var(--verde); border-bottom: 2px solid var(--verde); padding-bottom: 1.5mm; margin: 0 0 4mm; page-break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 5mm 0 2mm; color: var(--naranja); page-break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ul, ol { margin: 0 0 3mm; padding-left: 5mm; }
+  li { margin-bottom: 1.2mm; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 4mm; font-size: 9.5pt; page-break-inside: auto; }
+  th, td { border: 1px solid var(--linea); padding: 1.6mm 2mm; vertical-align: top; text-align: left; }
+  th { background: var(--crema); font-weight: 600; }
+  tr { page-break-inside: avoid; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  td img { width: 22mm; height: 22mm; object-fit: contain; display: block; background: #fff; }
+  .seccion { page-break-before: always; }
+  .portada { height: 250mm; display: flex; flex-direction: column; justify-content: space-between; }
+  .portada .meta { color: var(--gris); font-size: 11pt; }
+  .caja { background: var(--crema); border-left: 4px solid var(--naranja); padding: 3mm 4mm; margin: 3mm 0 4mm; page-break-inside: avoid; }
+  .nota { color: var(--gris); font-size: 9pt; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+  .check li { list-style: none; position: relative; padding-left: 7mm; }
+  .check li::before { content: ""; position: absolute; left: 0; top: 1mm; width: 4mm; height: 4mm; border: 1.5px solid var(--verde); border-radius: 1mm; }
+  code, .mono { font-family: Consolas, "Courier New", monospace; font-size: 9.5pt; background: #f2efe9; padding: 0 1mm; border-radius: 1mm; }
+  pre { background: #f2efe9; padding: 3mm; border-radius: 2mm; font-size: 9pt; white-space: pre-wrap; page-break-inside: avoid; }
+  svg text { font-family: "Segoe UI", Arial, sans-serif; }
+  .figura { margin: 3mm 0 4mm; page-break-inside: avoid; }
+  .figura .pie { font-size: 9pt; color: var(--gris); margin-top: 1mm; }
+  .total td { font-weight: 700; background: var(--crema); }
+  a { color: var(--verde); text-decoration: none; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- PORTADA -->
+<div class="portada">
+  <div>
+    <p class="meta">Ecoestudio Solar · Proyecto de recuperación de aves nativas · Del Viso</p>
+    <h1>Estación Nativa<br><span style="font-size:16pt;color:var(--naranja)">Informe técnico para el taller · versión 1.0</span></h1>
+    <p style="font-size:12pt;max-width:150mm">Estación solar de agua y registro fotográfico de aves, con módem 4G compartido por sector. Lista de materiales con precios verificados, cálculo de energía, conexiones pin por pin, armado paso a paso, configuración del módem, especificación del firmware y del servidor.</p>
+  </div>
+  <div class="caja">
+    <p><b>Cómo usar este documento.</b> Está escrito para ejecutarse en orden: primero la sección 7 (armado de una estación en la mesa) con la sección 6 (conexiones) al lado, después la 8 (módem), la 9 (firmware) y recién al final la 11 (campo). Cada paso termina en una verificación con el multímetro o con el monitor serie. Si una verificación falla, no seguir.</p>
+  </div>
+  <div class="meta">
+    <p>Preparado por Nicolás Gutiérrez · 11 de octubre de 2026 · Precios en pesos argentinos tomados de publicaciones de MercadoLibre el 11/10/2026 (ver links en la sección 3).</p>
+    <p>Carpeta del proyecto: <code>D:\Documentos\estacion-aves</code> · Repositorio público: github.com/nik0793/estacion-nativa · Fotos de los componentes en <code>imagenes\dispositivos</code> · Prompts para los renders en <code>docs\prompts-imagenes.md</code></p>
+  </div>
+</div>
+
+<!-- 1. QUÉ VAMOS A CONSTRUIR -->
+<div class="seccion">
+<h2>1. Qué vamos a construir</h2>
+<p>Un <b>sector</b> es un grupo de estaciones alrededor de un punto de interés (el estanque) a pocos metros entre sí. Todas comparten <b>un solo módem 4G USB con WiFi</b> y <b>un solo chip</b>. Cada estación es autónoma en energía: panel solar chico, dos pilas 18650 y un ESP32-CAM que duerme casi todo el tiempo.</p>
+<ul>
+  <li><b>Estación base</b> (la que se repite): ESP32-CAM + sensor PIR + panel + pilas. Saca dos fotos cuando un ave se posa, las guarda en su memoria flash y las sube en la próxima ventana de conexión.</li>
+  <li><b>Estación maestra</b> (una por sector): es una estación base que además enciende el módem 4G en ventanas horarias con una llave MOSFET y paneles y pilas extra.</li>
+  <li><b>Estación comedero</b> (una por sector): es una estación base que además mueve un servo dosificador de alimento en horarios programados y mide con una boya el nivel del tanque de agua.</li>
+  <li><b>Agua</b>: tanque de 20 litros por gravedad con válvula a flotante mecánica en el bebedero. No consume energía; el equipo solo avisa cuando el tanque está por vaciarse.</li>
+</ul>
+
+<div class="figura">
+<svg viewBox="0 0 760 250" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="f" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#1f5e3a"/></marker></defs>
+  <rect x="10" y="20" width="250" height="210" rx="10" fill="#f6f1e8" stroke="#d8d3c8"/>
+  <text x="135" y="42" text-anchor="middle" font-size="13" font-weight="700" fill="#1f5e3a">SECTOR ESTANQUE (campo)</text>
+  <g font-size="11" fill="#1b1b1b">
+    <rect x="25" y="55" width="100" height="36" rx="5" fill="#fff" stroke="#1f5e3a"/><text x="75" y="71" text-anchor="middle">Estación base</text><text x="75" y="84" text-anchor="middle" font-size="9" fill="#666">ESP32-CAM + PIR</text>
+    <rect x="25" y="100" width="100" height="36" rx="5" fill="#fff" stroke="#1f5e3a"/><text x="75" y="116" text-anchor="middle">Estación base</text><text x="75" y="129" text-anchor="middle" font-size="9" fill="#666">ESP32-CAM + PIR</text>
+    <rect x="25" y="145" width="100" height="36" rx="5" fill="#fff" stroke="#1f5e3a"/><text x="75" y="161" text-anchor="middle">Est. comedero</text><text x="75" y="174" text-anchor="middle" font-size="9" fill="#666">+ servo + boya</text>
+    <rect x="145" y="100" width="100" height="50" rx="5" fill="#fff" stroke="#d9702b" stroke-width="2"/><text x="195" y="118" text-anchor="middle">Est. maestra</text><text x="195" y="131" text-anchor="middle" font-size="9" fill="#666">+ llave MOSFET</text><text x="195" y="143" text-anchor="middle" font-size="9" fill="#666">+ módem 4G USB</text>
+    <path d="M125,73 L145,110" stroke="#1f5e3a" stroke-dasharray="3,3" fill="none"/>
+    <path d="M125,118 L145,122" stroke="#1f5e3a" stroke-dasharray="3,3" fill="none"/>
+    <path d="M125,163 L145,135" stroke="#1f5e3a" stroke-dasharray="3,3" fill="none"/>
+    <text x="135" y="205" text-anchor="middle" font-size="9" fill="#666">WiFi del módem, 5 minutos por hora</text>
+  </g>
+  <path d="M260,125 L330,125" stroke="#1f5e3a" stroke-width="2" marker-end="url(#f)"/>
+  <text x="295" y="115" text-anchor="middle" font-size="10" fill="#1f5e3a">4G, chip prepago</text>
+  <rect x="335" y="80" width="150" height="90" rx="10" fill="#fff" stroke="#1f5e3a" stroke-width="2"/>
+  <text x="410" y="105" text-anchor="middle" font-size="12" font-weight="700" fill="#1f5e3a">Hostinger</text>
+  <text x="410" y="122" text-anchor="middle" font-size="10">PHP + MySQL</text>
+  <text x="410" y="137" text-anchor="middle" font-size="10">recibe fotos y estado</text>
+  <text x="410" y="152" text-anchor="middle" font-size="10">entrega órdenes</text>
+  <path d="M485,105 L560,70" stroke="#1f5e3a" stroke-width="2" marker-end="url(#f)"/>
+  <path d="M485,125 L560,125" stroke="#1f5e3a" stroke-width="2" marker-end="url(#f)"/>
+  <path d="M485,145 L560,185" stroke="#1f5e3a" stroke-width="2" marker-end="url(#f)"/>
+  <rect x="565" y="45" width="180" height="40" rx="8" fill="#f6f1e8" stroke="#d8d3c8"/><text x="655" y="62" text-anchor="middle" font-size="11">Web pública</text><text x="655" y="76" text-anchor="middle" font-size="9" fill="#666">galería, especies, sponsors</text>
+  <rect x="565" y="105" width="180" height="40" rx="8" fill="#f6f1e8" stroke="#d8d3c8"/><text x="655" y="122" text-anchor="middle" font-size="11">App (PWA) de Iván</text><text x="655" y="136" text-anchor="middle" font-size="9" fill="#666">últimas fotos, nivel de agua, órdenes</text>
+  <rect x="565" y="165" width="180" height="40" rx="8" fill="#f6f1e8" stroke="#d8d3c8"/><text x="655" y="182" text-anchor="middle" font-size="11">BirdNET (PC o PiPO)</text><text x="655" y="196" text-anchor="middle" font-size="9" fill="#666">identifica especie por audio, v2</text>
+</svg>
+<div class="pie">Figura 1. Arquitectura. Las estaciones no hablan entre sí: cada una se conecta al WiFi del módem en la ventana y habla con el servidor.</div>
+</div>
+
+<h2 style="margin-top:6mm">2. Decisiones de diseño (y por qué)</h2>
+<table>
+<tr><th style="width:38%">Decisión</th><th>Razón</th></tr>
+<tr><td>El equipo duerme en <b>deep sleep</b> y el módem está <b>apagado</b> salvo en ventanas de 6 minutos por hora.</td><td>Un módem 4G encendido todo el día consume unas 10 veces más que todo el resto. Es lo único que permite usar paneles de 1,5 W y dos pilas.</td></tr>
+<tr><td><b>Un módem por sector</b>, compartido por WiFi.</td><td>Un solo chip y un solo equipo de 63.000 $ para 4 o más cámaras. Agregar una cámara cuesta solo la cámara.</td></tr>
+<tr><td><b>Sin microSD</b>: las fotos se guardan en la flash del ESP32 (LittleFS, 1,5 MB) hasta la ventana.</td><td>Libera 6 pines del ESP32-CAM (que es el cuello de botella), saca un componente que falla con humedad y ahorra energía. 1,5 MB guarda unas 30 fotos; sobra para una hora.</td></tr>
+<tr><td><b>Agua por gravedad con flotante mecánico.</b></td><td>Cero energía, cero bombas, cero firmware. Es la parte que más usan las aves y la que menos puede fallar.</td></tr>
+<tr><td>Una sola fuente de <b>5 V</b> (módulo TP4056 + MT3608 integrados) alimenta al ESP32-CAM por su pin 5V.</td><td>Un módulo de 4.390 $ hace carga solar, protección de la pila y 5 V. Cuesta unos 6 mA extra en sueño; se acepta en v1 y se mejora en v2 (sección 13).</td></tr>
+<tr><td>El <b>PIR se alimenta directo de la pila</b> (3,7 a 4,2 V), no de los 5 V.</td><td>El regulador del HC-SR501 funciona desde 3,6 V. Así el PIR sigue vivo con el ESP32 dormido y gasta 50 µA.</td></tr>
+<tr><td>Identificación de especie <b>en el servidor</b>, no en el equipo.</td><td>BirdNET necesita una Raspberry Pi, que consume más en una hora que la estación en un día.</td></tr>
+<tr><td>Los pájaros no se ven <b>en vivo</b>. Las órdenes (dar comida, sacar foto, cambiar horario) se ejecutan en la próxima ventana.</td><td>Consecuencia directa de dormir el módem. Hasta una hora de demora es aceptable para este uso.</td></tr>
+</table>
+</div>
+
+<!-- 3. LISTA DE MATERIALES -->
+<div class="seccion">
+<h2>3. Lista de materiales con precios verificados</h2>
+<p>Precios tomados el 11/10/2026 de las publicaciones indicadas. Los marcados <i>(est.)</i> son estimaciones de ferretería o insumos que ya tenés. Las fotos están en <code>imagenes\dispositivos</code>.</p>
+
+<h3>3.1 Estación base (se repite en cada punto)</h3>
+<table>
+<tr><th style="width:26mm">Foto</th><th>Componente</th><th class="num">Cant.</th><th class="num">Unitario $</th><th class="num">Subtotal $</th><th>Vendedor / publicación</th></tr>
+<tr><td><img src="../imagenes/dispositivos/esp32-cam.webp"></td><td><b>ESP32-CAM con cámara OV2640</b> (AI-Thinker). Cerebro, WiFi y cámara en una placa de 27×40 mm.</td><td class="num">1</td><td class="num">24.559</td><td class="num">24.559</td><td>Starware (Full) · <a href="https://articulo.mercadolibre.com.ar/MLA-784007609-esp32-cam-camara-modulo-wifi-bt-arduino-ov2640-2mp-_JM">MLA-784007609</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/tp4056-boost-j5019.webp"></td><td><b>Módulo J5019: cargador TP4056 + elevador MT3608</b>, entrada USB-C y pads IN+/IN-, salida regulable 4,3 a 27 V, 1 A, con protección de la pila.</td><td class="num">1</td><td class="num">4.390</td><td class="num">4.390</td><td>Informática San Isidro · <a href="https://articulo.mercadolibre.com.ar/MLA-1981186488-cargador-bateria-litio-tp4056-1a-con-fuente-boost-step-up-2a-_JM">MLA-1981186488</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/panel-solar-6v-1_5w.webp"></td><td><b>Panel solar 6 V 1,5 W</b> epoxi, 112×91 mm, 250 mA. Van dos en paralelo.</td><td class="num">2</td><td class="num">14.999</td><td class="num">29.998</td><td>Candy-Ho · <a href="https://articulo.mercadolibre.com.ar/MLA-637068205-panel-solar-policristalino-mini-epoxy-6v-0-250ma-112x91-mm-_JM">MLA-637068205</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/bateria-18650.webp"></td><td><b>Pila 18650 3,7 V 3000 mAh</b>. Van dos en paralelo. Hay celdas de 8.000 a 12.000 $ y recuperadas de notebook gratis; verificar capacidad real antes de usarlas.</td><td class="num">2</td><td class="num">26.114</td><td class="num">52.228</td><td>Fullenergy · <a href="https://articulo.mercadolibre.com.ar/MLA-833373093-bateria-recargable-de-litio-18650-37v-3000mah-_JM">MLA-833373093</a></td></tr>
+<tr><td></td><td>Portapilas doble 18650 con cables.</td><td class="num">1</td><td class="num">3.000</td><td class="num">3.000</td><td>(est.)</td></tr>
+<tr><td><img src="../imagenes/dispositivos/pir-hc-sr501.webp"></td><td><b>Sensor PIR HC-SR501</b>. Despierta al ESP32 cuando algo se mueve frente al bebedero.</td><td class="num">1</td><td class="num">3.229</td><td class="num">3.229</td><td>TodoMicro · <a href="https://articulo.mercadolibre.com.ar/MLA-878891033-modulo-sensor-movimiento-pir-infrarrojo-hc-sr501-arduino-_JM">MLA-878891033</a></td></tr>
+<tr><td></td><td>Dos resistencias de 100 kΩ, cable fino, conectores Dupont o JST, termocontraíble, un capacitor electrolítico de 470 µF 10 V.</td><td class="num">1</td><td class="num">4.000</td><td class="num">4.000</td><td>(est.)</td></tr>
+<tr><td></td><td>Caja impresa en PETG o ASA, prensacable, tornillos, abrazaderas y poste de madera de 1 m.</td><td class="num">1</td><td class="num">10.000</td><td class="num">10.000</td><td>(est.)</td></tr>
+<tr class="total"><td></td><td>Subtotal estación base</td><td></td><td></td><td class="num">131.404</td><td></td></tr>
+</table>
+
+<h3 style="page-break-before:always">3.2 Extras de la estación maestra (una por sector)</h3>
+<table>
+<tr><th style="width:26mm">Foto</th><th>Componente</th><th class="num">Cant.</th><th class="num">Unitario $</th><th class="num">Subtotal $</th><th>Vendedor / publicación</th></tr>
+<tr><td><img src="../imagenes/dispositivos/modem-4g-usb-wifi-2.webp"></td><td><b>Módem 4G USB con WiFi, liberado</b>. Bandas LTE B1/B2/B3/B4/B5/B7/B8/B17/B20/B28 (incluye B4 y B28, las de Argentina), hasta 10 equipos por WiFi, WPA2. Garantía del vendedor 1 mes, devolución ML 30 días.</td><td class="num">1</td><td class="num">63.000</td><td class="num">63.000</td><td>Techno Space 044 (Full) · <a href="https://www.mercadolibre.com.ar/modem-4g-usb-wifi-liberado-inalambrico-lte/up/MLAU3374858134">MLAU3374858134</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/mt3608-step-up.webp"></td><td><b>Elevador MT3608 2 A</b> dedicado al módem, ajustado a 5,0 V.</td><td class="num">1</td><td class="num">4.219</td><td class="num">4.219</td><td>Informática San Isidro · <a href="https://articulo.mercadolibre.com.ar/MLA-768204545-fuente-convertidor-boost-elevador-dc-dc-step-up-2a-mt3608-_JM">MLA-768204545</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/mosfet-aod4184.webp"></td><td><b>MOSFET AOD4184</b> (canal N, nivel lógico, TO-252). Llave que corta la alimentación del módem. Se suelda sobre un trozo de plaqueta perforada o adaptador.</td><td class="num">1</td><td class="num">6.087</td><td class="num">6.087</td><td>ITT · <a href="https://articulo.mercadolibre.com.ar/MLA-640228615-mosfet-n-aod4184a-40v-50a-to252-aod4184-_JM">MLA-640228615</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/panel-solar-6v-1_5w.webp"></td><td>Dos paneles 6 V 1,5 W más (la maestra lleva cuatro).</td><td class="num">2</td><td class="num">14.999</td><td class="num">29.998</td><td>Candy-Ho · MLA-637068205</td></tr>
+<tr><td><img src="../imagenes/dispositivos/bateria-18650.webp"></td><td>Dos pilas 18650 más (la maestra lleva cuatro) y un portapilas doble extra.</td><td class="num">2</td><td class="num">26.114</td><td class="num">55.228</td><td>Fullenergy · MLA-833373093 (+3.000 est. portapilas)</td></tr>
+<tr><td></td><td>Conector USB-A hembra para alimentar el módem, 100 Ω y 100 kΩ para el gate.</td><td class="num">1</td><td class="num">1.500</td><td class="num">1.500</td><td>(est.)</td></tr>
+<tr class="total"><td></td><td>Subtotal extras maestra</td><td></td><td></td><td class="num">160.032</td><td></td></tr>
+</table>
+
+<h3>3.3 Extras de la estación comedero (una por sector)</h3>
+<table>
+<tr><th style="width:26mm">Foto</th><th>Componente</th><th class="num">Cant.</th><th class="num">Unitario $</th><th class="num">Subtotal $</th><th>Vendedor / publicación</th></tr>
+<tr><td><img src="../imagenes/dispositivos/servo-sg90.webp"></td><td><b>Servo SG90</b> para la compuerta de la tolva de alimento.</td><td class="num">1</td><td class="num">5.998</td><td class="num">5.998</td><td>Marstech · <a href="https://www.mercadolibre.com.ar/servo-motor-tower-pro-sg90-9g-compatible-arduino-rotacion/p/MLA79821906">MLA79821906</a></td></tr>
+<tr><td><img src="../imagenes/dispositivos/mosfet-aod4184.webp"></td><td>Segundo <b>AOD4184</b> para cortar la alimentación del servo cuando no se usa.</td><td class="num">1</td><td class="num">6.087</td><td class="num">6.087</td><td>ITT · MLA-640228615</td></tr>
+<tr><td><img src="../imagenes/dispositivos/sensor-boya-flotante.webp"></td><td><b>Sensor de nivel a boya</b> (interruptor flotante) para el tanque de agua.</td><td class="num">1</td><td class="num">14.520</td><td class="num">14.520</td><td>ITT · <a href="https://articulo.mercadolibre.com.ar/MLA-830475459-sensor-nivel-liquido-electrico-boya-flotante-itytarg-_JM">MLA-830475459</a></td></tr>
+<tr><td></td><td>Bidón de 20 L, válvula flotante mecánica de 1/2" (tipo tanque de inodoro o bebedero de animales), manguera y bebedero de piedra o cemento.</td><td class="num">1</td><td class="num">15.000</td><td class="num">15.000</td><td>(est., ferretería)</td></tr>
+<tr><td></td><td>Tolva impresa con compuerta para el servo.</td><td class="num">1</td><td class="num">3.000</td><td class="num">3.000</td><td>(est., filamento)</td></tr>
+<tr class="total"><td></td><td>Subtotal extras comedero</td><td></td><td></td><td class="num">44.605</td><td></td></tr>
+</table>
+
+<h3>3.4 Comunes a todo el proyecto</h3>
+<table>
+<tr><th style="width:26mm">Foto</th><th>Componente</th><th class="num">Cant.</th><th class="num">Unitario $</th><th class="num">Subtotal $</th><th>Vendedor / publicación</th></tr>
+<tr><td><img src="../imagenes/dispositivos/esp32-cam-mb.webp"></td><td><b>Placa programadora ESP32-CAM-MB</b> (CH340). Una sola para programar todas las estaciones.</td><td class="num">1</td><td class="num">8.999</td><td class="num">8.999</td><td>HobbyTronica · <a href="https://articulo.mercadolibre.com.ar/MLA-1138363194-placa-base-programador-esp32-cam-ov2640-esp32-cam-mb-hobb-_JM">MLA-1138363194</a></td></tr>
+<tr><td></td><td>Chip prepago de la operadora con mejor señal en el predio + primer pack de 1 GB.</td><td class="num">1</td><td class="num">5.000</td><td class="num">5.000</td><td>(est.) · costo mensual después: 3.000 a 5.000 $</td></tr>
+</table>
+</div>
+
+<!-- 4. PRESUPUESTO -->
+<div class="seccion">
+<h2>4. Presupuesto del sector estanque (4 estaciones)</h2>
+<table>
+<tr><th>Ítem</th><th class="num">Cant.</th><th class="num">$</th></tr>
+<tr><td>Estación base completa (incluye la de la maestra y la del comedero)</td><td class="num">4</td><td class="num">525.616</td></tr>
+<tr><td>Extras de la maestra (módem, llave, paneles y pilas extra)</td><td class="num">1</td><td class="num">160.032</td></tr>
+<tr><td>Extras del comedero (servo, boya, tanque, tolva)</td><td class="num">1</td><td class="num">44.605</td></tr>
+<tr><td>Programador y chip con primer mes</td><td class="num">1</td><td class="num">13.999</td></tr>
+<tr class="total"><td>Total del sector, todo nuevo</td><td></td><td class="num">744.252</td></tr>
+<tr><td>Costo mensual (datos del chip)</td><td></td><td class="num">3.000 a 5.000</td></tr>
+</table>
+<div class="caja">
+<p><b>Dónde se puede bajar.</b> Las pilas son el 29 % del total (8 celdas a 26.114 $). Con celdas recuperadas de packs de notebook, el sector baja a unos <b>535.000 $</b>; con celdas nuevas de 10.000 $, a unos <b>615.000 $</b>. La segunda partida grande son los 10 paneles de 1,5 W (150.000 $): para la maestra conviene cotizar un panel de 6 V 5 W o 6 W único, que suele salir menos que cuatro chicos.</p>
+<p><b>Referencia:</b> la alternativa con una placa integrada Waveshare ESP32-S3-SIM7670G cuesta 180.000 $ por estación más un chip por estación. Cuatro habrían salido 720.000 $ solo en placas.</p>
+</div>
+
+<h3>Para empezar: compra mínima de la etapa 1 (una estación en la mesa)</h3>
+<p>ESP32-CAM, programador, módulo J5019, dos paneles, dos pilas, portapilas, PIR y menudencias: <b>unos 131.000 $</b> más el programador (9.000 $). Con eso se prueba todo el firmware usando el WiFi de tu casa como si fuera el módem. El módem se compra recién cuando la estación ya sube fotos.</p>
+</div>
+
+<!-- 5. ENERGÍA -->
+<div class="seccion">
+<h2>5. Energía: por qué alcanza con paneles de 1,5 W</h2>
+<h3>5.1 Consumo diario estimado</h3>
+<table>
+<tr><th>Carga</th><th>Cálculo</th><th class="num">mAh/día</th></tr>
+<tr><td>ESP32-CAM en deep sleep alimentado por el pin 5V (regulador AMS1117 + cámara) más pérdidas del elevador</td><td>9 mA × 24 h</td><td class="num">216</td></tr>
+<tr><td>PIR HC-SR501 desde la pila</td><td>0,05 mA × 24 h</td><td class="num">1</td></tr>
+<tr><td>Divisor de medición de batería (100 k + 100 k)</td><td>0,02 mA × 24 h</td><td class="num">1</td></tr>
+<tr><td>Eventos: despertar, encender cámara, 2 fotos, guardar</td><td>40 eventos × 8 s × 250 mA</td><td class="num">22</td></tr>
+<tr><td>Ventanas de subida: WiFi, NTP, subir ~10 fotos, bajar órdenes</td><td>14 ventanas × 60 s × 200 mA</td><td class="num">47</td></tr>
+<tr class="total"><td>Estación base</td><td>≈ 1,1 Wh/día a 3,7 V</td><td class="num">≈ 290</td></tr>
+<tr><td>Extra maestra: módem 4G encendido en las ventanas</td><td>14 ventanas × 6 min × 1,2 W ≈ 1,7 Wh</td><td class="num">≈ 460</td></tr>
+<tr class="total"><td>Estación maestra</td><td>≈ 2,8 Wh/día</td><td class="num">≈ 750</td></tr>
+<tr><td>Extra comedero: servo 2 veces por día, 5 s</td><td>despreciable</td><td class="num">1</td></tr>
+</table>
+
+<h3>5.2 Generación y autonomía</h3>
+<ul>
+  <li>Un panel epoxi de 1,5 W rinde al sol real cerca de 1 W. En Buenos Aires en invierno hay unas 2,5 horas equivalentes de sol pleno sobre un panel inclinado al norte. Con 85 % de rendimiento de carga: <b>unos 2,1 Wh por panel por día</b> en invierno, el doble en verano.</li>
+  <li><b>Estación base</b>: 2 paneles ≈ 4,2 Wh/día contra 1,1 Wh de consumo. Cubre cuatro días nublados seguidos sin tocar la reserva.</li>
+  <li><b>Maestra</b>: 4 paneles ≈ 8,5 Wh/día contra 2,8 Wh.</li>
+  <li><b>Reserva</b>: base 2 × 3000 mAh = 6000 mAh → 20 días sin sol. Maestra 4 × 3000 mAh → 16 días sin sol.</li>
+</ul>
+<div class="caja">
+<p><b>Verificación obligatoria</b> en el paso 7.9: con el equipo dormido, el multímetro en serie con la pila tiene que marcar entre 7 y 11 mA en la estación base. Si marca más de 15 mA, algo quedó encendido (cámara sin apagar, LED de flash, módulo PIR mal alimentado) y hay que corregirlo antes de instalar.</p>
+</div>
+
+<div class="figura">
+<svg viewBox="0 0 760 120" width="100%" xmlns="http://www.w3.org/2000/svg">
+  <text x="10" y="18" font-size="11" font-weight="700" fill="#1f5e3a">Un día de la estación maestra (módem encendido = naranja, PIR activo = verde claro)</text>
+  <rect x="40" y="35" width="700" height="24" fill="#eee" stroke="#ccc"/>
+  <rect x="40" y="35" width="175" height="24" fill="#dcd8cf"/>
+  <rect x="215" y="35" width="408" height="24" fill="#d8ead9"/>
+  <rect x="623" y="35" width="117" height="24" fill="#dcd8cf"/>
+  <g fill="#d9702b">
+    <rect x="40" y="35" width="3" height="24"/>
+    <rect x="244" y="35" width="3" height="24"/><rect x="273" y="35" width="3" height="24"/><rect x="302" y="35" width="3" height="24"/><rect x="331" y="35" width="3" height="24"/><rect x="360" y="35" width="3" height="24"/><rect x="389" y="35" width="3" height="24"/><rect x="418" y="35" width="3" height="24"/><rect x="447" y="35" width="3" height="24"/><rect x="476" y="35" width="3" height="24"/><rect x="505" y="35" width="3" height="24"/><rect x="534" y="35" width="3" height="24"/><rect x="563" y="35" width="3" height="24"/><rect x="592" y="35" width="3" height="24"/><rect x="621" y="35" width="3" height="24"/>
+  </g>
+  <g font-size="9" fill="#666">
+    <text x="40" y="75">0 h</text><text x="215" y="75">6 h</text><text x="244" y="75">7 h</text><text x="418" y="75">13 h</text><text x="623" y="75">20 h</text><text x="722" y="75">24 h</text>
+    <text x="40" y="100">Ventanas a las 0 h y de 7 a 20 h en punto (15 por día). PIR activo de 6 a 20 h. De noche solo la ventana de las 0 h.</text>
+  </g>
+</svg>
+<div class="pie">Figura 2. Ciclo diario. Las estaciones despiertan a los 60 s de cada hora y buscan el WiFi del módem durante 2 minutos como máximo.</div>
+</div>
+</div>
+
+<!-- 6. CONEXIONES -->
+<div class="seccion">
+<h2>6. Conexiones pin por pin</h2>
+<h3>6.1 Pines del ESP32-CAM que se usan</h3>
+<table>
+<tr><th>Pin ESP32-CAM</th><th>Función en la estación</th><th>Detalle</th></tr>
+<tr><td><b>5V</b></td><td>Alimentación</td><td>Desde OUT+ del módulo J5019 ajustado a 5,0 V. Capacitor de 470 µF entre 5V y GND, lo más cerca posible de la placa.</td></tr>
+<tr><td><b>GND</b></td><td>Masa común</td><td>Todas las masas unidas: J5019 OUT-, BAT-, PIR GND, divisor, MOSFET source.</td></tr>
+<tr><td><b>GPIO13</b></td><td>PIR OUT</td><td>Entrada de despertar (ext0, flanco alto). Es pin RTC, por eso funciona en deep sleep.</td></tr>
+<tr><td><b>GPIO15</b></td><td>Medición de batería</td><td>Punto medio del divisor 100 k / 100 k entre BAT+ y GND. Se lee por ADC2 antes de encender WiFi.</td></tr>
+<tr><td><b>GPIO4</b></td><td>Llave del módem (solo maestra)</td><td>Gate del AOD4184 a través de 100 Ω, con 100 kΩ de gate a GND. Es el mismo pin del LED de flash: el LED prende mientras el módem está encendido y sirve de indicador. En las estaciones base queda libre.</td></tr>
+<tr><td><b>GPIO12</b></td><td>Señal del servo (solo comedero)</td><td>Cable naranja del SG90. Nada más conectado a este pin: es pin de arranque y debe quedar en bajo al encender.</td></tr>
+<tr><td><b>GPIO2</b></td><td>Llave del servo (solo comedero)</td><td>Gate del segundo AOD4184 (100 Ω + 100 kΩ a GND) que corta la masa del servo.</td></tr>
+<tr><td><b>GPIO14</b></td><td>Boya del tanque (solo comedero)</td><td>Un cable de la boya a GPIO14, el otro a GND. Se lee con pull-up interno.</td></tr>
+<tr><td><b>U0T / U0R / GPIO0</b></td><td>Programación</td><td>Solo con la placa ESP32-CAM-MB. No conectar nada más ahí.</td></tr>
+<tr><td>GPIO16, GPIO1, GPIO3</td><td>No usar</td><td>PSRAM y UART.</td></tr>
+</table>
+
+<h3>6.2 Esquema de bloques</h3>
+<div class="figura">
+<svg viewBox="0 0 760 390" width="100%" xmlns="http://www.w3.org/2000/svg" font-size="9.5">
+  <defs><marker id="a" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0,0 L7,3.5 L0,7 z" fill="#1b1b1b"/></marker></defs>
+  <!-- fila 1 -->
+  <rect x="10" y="20" width="130" height="64" rx="6" fill="#fff8e6" stroke="#d9702b"/><text x="75" y="45" text-anchor="middle" font-weight="700">2 paneles 6 V</text><text x="75" y="60" text-anchor="middle">en paralelo</text><text x="75" y="74" text-anchor="middle" fill="#666">+ a IN+ · − a IN−</text>
+  <rect x="175" y="10" width="170" height="84" rx="6" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="260" y="28" text-anchor="middle" font-weight="700">Módulo J5019</text><text x="260" y="42" text-anchor="middle">TP4056 + MT3608</text><text x="185" y="60">IN+ / IN− ← paneles</text><text x="185" y="74">BAT+ / BAT− ← pilas</text><text x="185" y="88" fill="#d9702b">OUT+ / OUT− = 5,0 V</text>
+  <path d="M140,52 L175,52" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/>
+  <rect x="400" y="10" width="350" height="84" rx="6" fill="#fff" stroke="#1f5e3a" stroke-width="2"/><text x="575" y="28" text-anchor="middle" font-weight="700">ESP32-CAM</text>
+  <text x="410" y="46">5V ← OUT+ (con 470 µF a GND)</text><text x="410" y="60">GND ← OUT− (masa común)</text><text x="410" y="74">GPIO13 ← PIR OUT</text><text x="410" y="88">GPIO15 ← punto medio del divisor</text>
+  <text x="590" y="46">GPIO4 → gate llave módem (maestra)</text><text x="590" y="60">GPIO12 → señal servo (comedero)</text><text x="590" y="74">GPIO2 → gate llave servo (comedero)</text><text x="590" y="88">GPIO14 ← boya (comedero)</text>
+  <path d="M345,52 L400,52" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/><text x="372" y="46" text-anchor="middle" fill="#d9702b">5 V</text>
+  <!-- fila 2 -->
+  <rect x="175" y="125" width="170" height="50" rx="6" fill="#fff8e6" stroke="#d9702b"/><text x="260" y="146" text-anchor="middle" font-weight="700">2 × 18650 en paralelo</text><text x="260" y="162" text-anchor="middle">+ a BAT+ · − a BAT−</text>
+  <path d="M260,94 L260,125" stroke="#1b1b1b" stroke-width="1.5"/>
+  <rect x="400" y="125" width="165" height="50" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="482" y="146" text-anchor="middle" font-weight="700">PIR HC-SR501</text><text x="482" y="162" text-anchor="middle">VCC ← BAT+ · GND · OUT → GPIO13</text>
+  <path d="M345,150 L400,150" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/><text x="372" y="144" text-anchor="middle" fill="#666">3,7–4,2 V</text>
+  <rect x="585" y="125" width="165" height="50" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="667" y="143" text-anchor="middle" font-weight="700">Divisor 100 k / 100 k</text><text x="667" y="157" text-anchor="middle">BAT+ → 100 k → GPIO15</text><text x="667" y="169" text-anchor="middle">GPIO15 → 100 k → GND</text>
+  <!-- maestra -->
+  <text x="10" y="215" font-size="11" font-weight="700" fill="#d9702b">Solo estación maestra</text>
+  <rect x="10" y="225" width="165" height="56" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="92" y="243" text-anchor="middle" font-weight="700">AOD4184 (llave)</text><text x="92" y="257" text-anchor="middle">Gate ← GPIO4 (100 Ω)</text><text x="92" y="271" text-anchor="middle">100 kΩ gate–source · Source → BAT−</text>
+  <rect x="205" y="225" width="165" height="56" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="287" y="243" text-anchor="middle" font-weight="700">MT3608 2 A</text><text x="287" y="257" text-anchor="middle">IN+ ← BAT+ · IN− ← Drain</text><text x="287" y="271" text-anchor="middle">OUT ajustado a 5,0 V</text>
+  <rect x="400" y="225" width="165" height="56" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="482" y="243" text-anchor="middle" font-weight="700">USB-A hembra</text><text x="482" y="257" text-anchor="middle">pin 1 (VBUS) ← OUT+</text><text x="482" y="271" text-anchor="middle">pin 4 (GND) ← OUT−</text>
+  <rect x="595" y="225" width="155" height="56" rx="6" fill="#fff8e6" stroke="#d9702b"/><text x="672" y="248" text-anchor="middle" font-weight="700">Módem 4G USB WiFi</text><text x="672" y="264" text-anchor="middle">con chip prepago</text>
+  <path d="M175,253 L205,253" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M370,253 L400,253" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/>
+  <path d="M565,253 L595,253" stroke="#1b1b1b" stroke-width="1.5" marker-end="url(#a)"/>
+  <!-- comedero -->
+  <text x="10" y="318" font-size="11" font-weight="700" fill="#d9702b">Solo estación comedero</text>
+  <rect x="10" y="328" width="360" height="60" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="190" y="344" text-anchor="middle" font-weight="700">Servo SG90</text><text x="190" y="357" text-anchor="middle">rojo ← OUT+ (5 V) · naranja ← GPIO12 · marrón ← Drain del 2.º AOD4184</text><text x="190" y="370" text-anchor="middle">2.º AOD4184: Source → GND · Gate ← GPIO2 con 100 Ω</text><text x="190" y="383" text-anchor="middle">y 100 kΩ entre Gate y Source</text>
+  <rect x="400" y="328" width="350" height="60" rx="6" fill="#fff" stroke="#1f5e3a"/><text x="575" y="348" text-anchor="middle" font-weight="700">Boya del tanque</text><text x="575" y="363" text-anchor="middle">un cable a GPIO14, el otro a GND</text><text x="575" y="377" text-anchor="middle">(se lee con pull-up interno; cerrada = tanque ok)</text>
+</svg>
+<div class="pie">Figura 3. Bloques de conexión. "Drain", "Source" y "Gate" son las tres patas del AOD4184: con la impresión hacia arriba y las patas hacia abajo, Gate es la izquierda, Drain la del medio (y la lengüeta metálica), Source la derecha.</div>
+</div>
+
+<h3>6.3 Reglas de cableado</h3>
+<ul>
+  <li>Cable de 0,5 mm² como mínimo entre pilas, J5019 y ESP32-CAM; los picos de WiFi son de 400 mA y el módem pide hasta 1,5 A del lado de la pila.</li>
+  <li>Las dos pilas en paralelo tienen que ser del mismo modelo y estar a la misma tensión (±0,05 V) antes de unirlas. Medir cada una por separado.</li>
+  <li>Las dos entradas de panel en paralelo van directo a IN+ e IN− del J5019. No conectar nunca el panel al pin 5V del ESP32.</li>
+  <li>Ajustar el trimmer del elevador a 5,0 V <b>antes</b> de conectar el ESP32-CAM, midiendo OUT+ con el multímetro y una carga chica (una resistencia de 1 kΩ).</li>
+  <li>En el HC-SR501: jumper en posición <b>L</b> (un solo disparo), trimmer de tiempo al mínimo (todo a la izquierda, unos 3 s), trimmer de sensibilidad a la mitad.</li>
+</ul>
+</div>
+
+<!-- 7. ARMADO -->
+<div class="seccion">
+<h2>7. Armado de una estación base, paso a paso</h2>
+<p>Tiempo estimado: una tarde para la primera, dos horas para las siguientes. Herramientas: soldador, multímetro, pelacables, PC con Arduino IDE 2.x, cable micro USB de datos.</p>
+<ol>
+  <li><b>Probar el ESP32-CAM pelado.</b> Montarlo sobre la placa ESP32-CAM-MB, conectar por USB. En Arduino IDE instalar el paquete "esp32 by Espressif" (versión 3.x), elegir placa <code>AI Thinker ESP32-CAM</code>, <code>Partition Scheme: Huge APP (3MB No OTA/1MB SPIFFS)</code>, velocidad 115200. Abrir <i>Ejemplos → ESP32 → Camera → CameraWebServer</i>, poner el WiFi de tu casa, subir. <i>Verificación:</i> en el monitor serie aparece una IP; al abrirla en el navegador se ve video. Si la imagen tiene franjas o está verde, reasentar el cable plano de la cámara.</li>
+  <li><b>Enfocar la lente a 60 cm.</b> Con el video en pantalla y un objeto con texto a 60 cm, girar el aro de la lente (viene pegado; se despega con cuidado con una pinza) hasta que el texto esté nítido. Fijar con una gota de esmalte. Esa es la distancia a la que va a estar la percha o el borde del bebedero.</li>
+  <li><b>Preparar las pilas.</b> Medir cada 18650: tienen que estar entre 3,6 y 4,1 V y con menos de 0,05 V de diferencia entre sí. Si no, cargarlas por separado en un cargador de 18650 antes de ponerlas juntas en el portapilas.</li>
+  <li><b>Módulo J5019.</b> Soldar el portapilas a BAT+ y BAT− (respetar polaridad; el módulo no tiene protección contra inversión). Soldar dos cables a IN+ e IN− para los paneles. Poner las pilas. Con el multímetro en OUT+ / OUT− y una resistencia de 1 kΩ como carga, girar el trimmer hasta leer <b>5,00 V</b>. <i>Verificación:</i> 5,0 V estables; el LED de carga del TP4056 prende al conectar un panel al sol o un USB-C.</li>
+  <li><b>Alimentar el ESP32-CAM.</b> Soldar OUT+ al pin 5V y OUT− a GND del ESP32-CAM, con el capacitor de 470 µF entre ambos. <i>Verificación:</i> el ESP32 arranca (LED rojo trasero parpadea al reset) y el CameraWebServer sigue funcionando sin la placa MB conectada por USB.</li>
+  <li><b>PIR.</b> VCC del HC-SR501 a BAT+ (no a los 5 V), GND a GND, OUT a GPIO13. Jumper en L, tiempo al mínimo, sensibilidad a la mitad. <i>Verificación:</i> con un sketch mínimo que imprima <code>digitalRead(13)</code> cada 200 ms, al pasar la mano a 1 m la salida va a 1 durante unos 3 s y vuelve a 0. Esperar 60 s después de encender: el PIR se calibra.</li>
+  <li><b>Divisor de batería.</b> 100 kΩ de BAT+ a GPIO15 y 100 kΩ de GPIO15 a GND. <i>Verificación:</i> <code>analogReadMilliVolts(15)</code> × 2 tiene que coincidir con la tensión de la pila medida con el multímetro, ±0,1 V.</li>
+  <li><b>Cargar el firmware de la estación</b> (sección 9) con el WiFi de tu casa en la configuración y el servidor de pruebas. <i>Verificación:</i> al mover la mano frente al PIR, en 10 s aparece una foto nueva en el servidor (o en el monitor serie se lee "foto guardada", y en la próxima ventana "subida OK").</li>
+  <li><b>Medir el consumo en sueño.</b> Multímetro en escala de mA en serie con el cable BAT+ del portapilas. Con el equipo dormido (más de 30 s sin movimiento): <b>7 a 11 mA</b>. Si da más de 15 mA, revisar que el firmware apague la cámara (<code>esp_camera_deinit()</code>) y el LED de flash antes de dormir.</li>
+  <li><b>Paneles.</b> Soldar los dos paneles en paralelo (+ con +, − con −) y a IN+ / IN− del J5019 con cable de al menos 2 m hasta la caja. <i>Verificación:</i> al sol, con las pilas a menos de 4,1 V, el LED rojo del TP4056 prende y la tensión de las pilas sube lentamente.</li>
+  <li><b>Caja.</b> Imprimir la caja (sección 11), montar el ESP32-CAM con la lente en la ventana, el PIR con su cúpula asomando debajo de la lente, el J5019 y el portapilas abajo. Prensacable para los cables del panel. Silicona neutra en la ventana de la lente y en la cúpula del PIR. Sobre de gel de sílice adentro.</li>
+</ol>
+
+<h3>7.1 Extras de la maestra</h3>
+<ol>
+  <li>Soldar el AOD4184 sobre un trozo de plaqueta perforada: Source a BAT−, Drain a IN− del MT3608 de 2 A, Gate a GPIO4 a través de 100 Ω y con 100 kΩ entre Gate y Source.</li>
+  <li>MT3608: IN+ a BAT+. Ajustar la salida a <b>5,0 V</b> con carga de 1 kΩ antes de conectar el módem (poner GPIO4 en alto desde un sketch de prueba para que el MOSFET conduzca).</li>
+  <li>Conector USB-A hembra: pin 1 (VBUS) a OUT+, pin 4 (GND) a OUT−. Enchufar el módem. <i>Verificación:</i> con GPIO4 en alto, el módem enciende y a los 30–45 s aparece su red WiFi en el celular; con GPIO4 en bajo, el consumo de la rama del módem es 0.</li>
+  <li>La maestra lleva cuatro paneles (dos pares en paralelo) y dos portapilas (cuatro celdas en paralelo), todo al mismo J5019.</li>
+</ol>
+
+<h3>7.2 Extras del comedero</h3>
+<ol>
+  <li>Segundo AOD4184: Source a GND, Drain al cable marrón del servo, Gate a GPIO2 con 100 Ω y 100 kΩ a GND. Rojo del servo a OUT+ (5 V), naranja a GPIO12.</li>
+  <li>Boya: un cable a GPIO14, el otro a GND. Montarla en el bidón a la altura que corresponda a "quedan 3 litros".</li>
+  <li><i>Verificación:</i> con la orden "dar comida ahora" desde el servidor, en la próxima ventana el servo abre la compuerta 1 s y cierra; con el bidón vacío el estado reporta <code>tanque: bajo</code>.</li>
+</ol>
+</div>
+
+<!-- 8. MÓDEM Y CHIP -->
+<div class="seccion">
+<h2>8. Módem 4G y chip</h2>
+<ol>
+  <li><b>Antes de comprar el chip</b>: ir al estanque con un celular de cada operadora (Claro, Personal, Movistar) y anotar las barras de 4G en el lugar exacto de la maestra, a 1,5 m del suelo. Se compra el chip de la que tenga mejor señal. Si ninguna tiene 4G ahí, probar en el punto más alto del predio: la maestra puede ir hasta 15 m de las otras estaciones.</li>
+  <li><b>Chip prepago</b> a nombre de Iván, con pack de datos de 1 GB mensual y recarga automática desde la app de la operadora. Consumo esperado: 150 a 250 MB por mes para cuatro estaciones.</li>
+  <li><b>Primera configuración del módem</b>, en la casa, enchufado a un cargador USB: poner el chip, esperar 1 minuto, conectarse desde el celular al WiFi del módem (nombre y clave impresos en la etiqueta), entrar al panel del módem desde el navegador (la etiqueta indica la dirección; suele ser <code>192.168.0.1</code> o <code>192.168.100.1</code>).</li>
+  <li>En el panel: cambiar el nombre de la red WiFi a <code>estacion-nativa</code> y la clave a una de 12 caracteres (anotarla en el firmware). Si pide APN, usar el de la operadora: Claro <code>internet.ctimovil.com.ar</code>, Personal <code>datos.personal.com</code>, Movistar <code>internet.gprs.unifon.com.ar</code>. Desactivar cualquier opción de "apagado automático del WiFi" o "ahorro de energía" si existe.</li>
+  <li><i>Verificación:</i> el celular navega por el WiFi del módem. Desenchufar y volver a enchufar: el módem tiene que reconectarse solo, sin tocar nada, en menos de 60 s. Si no lo hace, devolverlo (hay 30 días).</li>
+  <li><b>Bandas</b>: la publicación declara B1/B2/B3/B4/B5/B7/B8/B17/B20/B28. Las de Argentina son B4, B7 y B28, así que está cubierto. Igual, probar en el campo dentro de los 30 días de devolución.</li>
+</ol>
+<div class="caja"><p><b>Alternativa si el módem genérico falla:</b> Huawei E8372 usado de Personal (13.500 a 22.000 $ en ML). La versión que vendió Personal en Argentina (E8372h-608) trae B4 y B28. Debe comprarse "liberado". Se conecta exactamente igual.</p></div>
+</div>
+
+<!-- 9. FIRMWARE -->
+<div class="seccion">
+<h2>9. Firmware de la estación</h2>
+<p>Un solo sketch para los tres tipos de estación; el tipo se elige con una constante. Carpeta: <code>firmware\estacion\estacion.ino</code>. Librerías: solo las que vienen con el paquete esp32 (esp_camera, WiFi, HTTPClient, LittleFS, esp_sleep).</p>
+
+<h3>9.1 Comportamiento</h3>
+<ol>
+  <li><b>Arranque.</b> Lee la causa del despertar: PIR (ext0), temporizador (ventana) o encendido. Lee la tensión de la pila por GPIO15 antes de encender WiFi.</li>
+  <li><b>Si despertó por PIR</b> y es de día (6 a 20 h): inicia la cámara en SVGA 800×600, JPEG calidad 12, descarta 2 cuadros, guarda una foto, espera 1,5 s, guarda otra. Nombre: <code>/f_ESTACION_AAAAMMDD_HHMMSS_n.jpg</code>. Si LittleFS supera 1,4 MB, borra la foto más vieja. Apaga la cámara. Si la pila está por debajo de 3,5 V, no saca fotos (solo reporta estado en la ventana).</li>
+  <li><b>Si es hora de ventana</b> (minuto 1 de cada hora de 7 a 20, y a las 0 h): en la maestra, primero pone GPIO4 en alto y espera 45 s. Todas: conectan al WiFi <code>estacion-nativa</code> con 90 s de tope; si no aparece, duermen hasta la próxima. Con WiFi: sincroniza hora por NTP, sube cada foto pendiente con POST multipart a <code>/api/foto.php</code> (borra el archivo al recibir 200), envía el estado a <code>/api/estado.php</code> (pila, fotos pendientes, tanque, causa de despertar), pide órdenes a <code>/api/ordenes.php?estacion=ID</code> y las ejecuta (dar comida: GPIO2 alto, servo a 90° un segundo, a 0°, GPIO2 bajo; foto ahora; cambiar horarios). La maestra apaga el módem al terminar o a los 6 minutos.</li>
+  <li><b>Comedero</b>: en las ventanas de las 8 y las 17 h ejecuta la dosificación programada aunque no haya órdenes.</li>
+  <li><b>Dormir.</b> Calcula los segundos hasta la próxima ventana, programa el temporizador y, si es de día, habilita ext0 en GPIO13. <code>esp_deep_sleep_start()</code>.</li>
+</ol>
+
+<h3>9.2 Constantes que se editan por estación</h3>
+<pre>#define ID_ESTACION      "estanque-1"     // estanque-1 (maestra), estanque-2, comedero-1
+#define TIPO_ESTACION    BASE             // BASE, MAESTRA o COMEDERO
+#define WIFI_SSID        "estacion-nativa"
+#define WIFI_CLAVE       "..."            // la que se puso en el módem
+#define SERVIDOR         "https://skyblue-gorilla-834934.hostingersite.com"  // sitio de Hostinger, sin barra final
+#define CLAVE_API        "..."            // 24 caracteres, igual en el servidor
+#define HORA_INICIO_PIR  6
+#define HORA_FIN_PIR     20
+#define MINUTO_VENTANA   1                // la maestra enciende el módem en el minuto 0
+#define PILA_MINIMA_MV   3500</pre>
+
+<h3>9.3 Cómo cargarlo</h3>
+<ol>
+  <li>Montar el ESP32-CAM en la placa MB, conectar el USB. Si la placa está armada en la caja, desconectar antes OUT+ del J5019 (el USB ya alimenta).</li>
+  <li>Arduino IDE: placa AI Thinker ESP32-CAM, Huge APP, 115200. Editar las constantes. Mantener apretado el botón IO0 de la MB mientras se presiona RST una vez si el IDE no entra en modo carga solo.</li>
+  <li>Abrir el monitor serie a 115200 y presionar RST. <i>Verificación:</i> se lee la causa de despertar, la tensión de pila y "durmiendo hasta HH:MM".</li>
+</ol>
+<p class="nota">El sketch completo está en <code>firmware\estacion\estacion.ino</code> y compila con el núcleo esp32 3.3.11 (1,2 MB, partición Huge APP). Todavía no se probó en un ESP32-CAM real: el paso 8 de la sección 7 es esa prueba. Lo que está en esta sección es el contrato que el sketch cumple; si algo del comportamiento cambia, cambia acá primero. El servidor está en <code>servidor\</code> (esquema SQL, API, galería y panel).</p>
+</div>
+
+<!-- 10. SERVIDOR -->
+<div class="seccion">
+<h2>10. Servidor en Hostinger</h2>
+<p>PHP 8 con SQLite en el plan Premium de Hostinger que ya tenés: no hay que crear ninguna base de datos, el archivo se crea solo en <code>domains\&lt;sitio&gt;\datos</code>, fuera de la carpeta pública. Carpeta del código: <code>servidor\</code>. Se publica con <code>desplegar.sh &lt;dominio&gt;</code> por SSH junto con la web; las claves van en <code>config.local.php</code> en el servidor (copiar el .ejemplo). Publicado en <code>https://skyblue-gorilla-834934.hostingersite.com/</code> (web en <code>/</code>, registros en <code>/registros/</code>, app en <code>/app/</code>); hay un espejo de la web en GitHub Pages.</p>
+<table>
+<tr><th>Endpoint</th><th>Método</th><th>Qué hace</th></tr>
+<tr><td><code>/api/foto.php</code></td><td>POST multipart</td><td>Campos: <code>estacion</code>, <code>clave</code>, <code>tomada</code> (fecha ISO), <code>archivo</code> (jpg). Guarda en <code>/fotos/AAAA/MM/</code>, inserta fila en <code>fotos</code>, responde 200 y <code>{"ok":true}</code>. Rechaza sin clave válida o archivos de más de 300 KB.</td></tr>
+<tr><td><code>/api/estado.php</code></td><td>POST JSON</td><td><code>{estacion, clave, pila_mv, pendientes, tanque, causa, version}</code>. Actualiza <code>estaciones</code>. Si <code>pila_mv</code> &lt; 3600 o <code>tanque</code> = bajo, deja un aviso que la app muestra.</td></tr>
+<tr><td><code>/api/ordenes.php</code></td><td>GET</td><td><code>?estacion=ID&amp;clave=...</code>. Devuelve las órdenes pendientes y las marca como entregadas: <code>[{"id":12,"tipo":"comida"},{"id":13,"tipo":"foto"},{"id":14,"tipo":"horario","valor":"8,17"}]</code>.</td></tr>
+<tr><td><code>/api/contacto.php</code></td><td>POST</td><td>Formulario de contacto de la web: nombre, correo, mensaje. Guarda en <code>contactos</code>, se ve en la app y, si está configurado, avisa por mail.</td></tr>
+<tr><td><code>/registros/</code></td><td>GET</td><td>Registros públicos: últimas fotos, galería por día, especies de la semana (cuando exista BirdNET) y estado de las estaciones. La web del proyecto es <code>/index.html</code>.</td></tr>
+<tr><td><code>/app/</code></td><td>GET</td><td>PWA para Iván con clave: últimas fotos, pila y tanque de cada estación, botones "dar comida", "sacar foto", horarios.</td></tr>
+</table>
+<h3>Tablas</h3>
+<pre>estaciones (id, nombre, tipo, ultimo_contacto, pila_mv, pendientes, tanque, causa, version, arranques)
+fotos      (id, estacion, tomada, recibida, archivo, bytes, especie, confianza, publicada)
+ordenes    (id, estacion, tipo, valor, creada, entregada)
+avisos     (id, estacion, texto, creado, visto)
+contactos  (id, nombre, correo, mensaje, origen, creado, leido)</pre>
+<p class="nota">Las tablas se crean solas en la primera llamada (función <code>asegurarEsquema</code> en <code>config.php</code>). Copia de seguridad: bajar <code>datos\estacion.sqlite</code> y la carpeta <code>fotos\</code>.</p>
+<p><b>Identificación de especies (v2):</b> un script en tu PC o en la PiPO baja cada noche las fotos nuevas y los clips de audio (cuando las estaciones tengan micrófono), corre BirdNET-Analyzer sobre el audio y escribe <code>especie</code> y <code>confianza</code> por la API. Mientras tanto, Iván etiqueta a mano desde la app: cada foto tiene un botón "¿qué ave es?" con las 15 especies más probables de la zona.</p>
+</div>
+
+<!-- 11. CAJA Y CAMPO -->
+<div class="seccion">
+<h2>11. Caja, montaje y puesta en campo</h2>
+<h3>11.1 Caja impresa</h3>
+<ul>
+  <li>Cuerpo de 95 × 70 × 55 mm interior, paredes de 2,4 mm, PETG o ASA (el PLA se deforma al sol). Tapa con labio y junta de silicona o cordón de TPU. Cuatro tornillos M3 con insertos.</li>
+  <li>Frente: ventana de 10 mm para la lente, con un visera de 15 mm arriba para la lluvia y el sol directo; agujero de 23 mm para la cúpula del PIR, 25 mm debajo de la lente.</li>
+  <li>Abajo: prensacable PG7 para los cables del panel y, en el comedero, para el servo y la boya. Un agujero de 2 mm en el punto más bajo como respiradero y drenaje, cubierto por dentro con un trocito de tela.</li>
+  <li>Atrás: dos ojales para abrazaderas al poste. La maestra lleva además una ventana para el módem o, más simple, el módem adentro de la caja con una caja un poco más larga (el módem mide 100 × 30 × 12 mm) y una pequeña ventana de plástico transparente para ver su LED.</li>
+  <li>Paneles: sobre el poste, en una ménsula impresa o de chapa, inclinados <b>35° hacia el norte</b>, por encima de la caja. Nunca debajo de una copa de árbol: los árboles que se plantan van a crecer.</li>
+</ul>
+<h3>11.2 Ubicación en el estanque</h3>
+<ul>
+  <li>Lente a <b>60 cm</b> del lugar donde se posan: borde del bebedero o una percha (rama seca de 15 mm clavada a 30 cm del agua). La cámara a 40 cm de altura, apuntando levemente hacia abajo. El sol nunca de frente a la lente: cámaras mirando al sur o al este.</li>
+  <li>PIR cubriendo el mismo punto. Evitar que vea el agua con el sol reflejado o ramas que se mueven con el viento; si dispara en falso, bajar la sensibilidad o tapar la mitad de la cúpula con cinta.</li>
+  <li>La maestra en el punto más alto y despejado del sector, a no más de 15 m de la estación más lejana, con vista directa (sin paredes ni troncos gruesos en el medio).</li>
+  <li>Bebedero de piedra o cemento, de 3 cm de profundidad máxima con bordes rugosos; tanque de 20 L a 50 cm de altura, conectado con manguera a la válvula flotante del bebedero. Limpiar el bebedero una vez por semana.</li>
+  <li>Tolva de alimento a 1,5 m del agua, con alimento para nativas: semilla de girasol negro, mijo y fruta cortada para zorzales y calandrias. Dosificar poco (30 g por vez) para que no quede comida en el piso.</li>
+</ul>
+<h3>11.3 Día de instalación, lista de control</h3>
+<ul class="check">
+  <li>Las cuatro estaciones subieron fotos desde la casa con el WiFi del módem antes de salir al campo.</li>
+  <li>Todas las pilas por encima de 3,9 V.</li>
+  <li>Hora del sistema correcta (se ve en el nombre de las fotos).</li>
+  <li>Postes clavados 40 cm, caja a 40 cm del suelo, panel al norte a 35°.</li>
+  <li>Celular conectado al WiFi del módem desde la posición de cada estación: señal de al menos 2 barras.</li>
+  <li>Primera ventana completa observada en el servidor: las cuatro estaciones reportaron estado.</li>
+  <li>Bebedero lleno, válvula flotante cortando, tanque lleno, boya reportando "ok".</li>
+  <li>Foto de cada estación instalada, para el informe y la web.</li>
+</ul>
+</div>
+
+<!-- 12. PRUEBAS -->
+<div class="seccion">
+<h2>12. Pruebas de aceptación</h2>
+<table>
+<tr><th>Prueba</th><th>Cómo</th><th>Resultado esperado</th></tr>
+<tr><td>Disparo por ave</td><td>Pasar la mano a 60 cm de la lente</td><td>Dos fotos nítidas en el servidor en la próxima ventana, con la hora correcta</td></tr>
+<tr><td>Consumo en sueño</td><td>Multímetro en serie con BAT+</td><td>Base: 7 a 11 mA. Maestra con módem apagado: igual</td></tr>
+<tr><td>Ventana</td><td>Mirar la maestra a la hora en punto</td><td>LED de flash prende a :00, red WiFi visible a :01, LED apaga antes de :07</td></tr>
+<tr><td>Falta de WiFi</td><td>Apagar la maestra una hora</td><td>Las estaciones guardan las fotos y las suben en la ventana siguiente; nada se pierde</td></tr>
+<tr><td>Orden</td><td>"Dar comida ahora" desde la app</td><td>En la próxima ventana el servo actúa y el estado lo confirma</td></tr>
+<tr><td>Tanque bajo</td><td>Levantar la boya con la mano</td><td>Aviso en la app en la próxima ventana</td></tr>
+<tr><td>Pila baja</td><td>Simular con el firmware (PILA_MINIMA_MV = 4300)</td><td>La estación deja de fotografiar y reporta "pila baja"; vuelve a fotografiar al bajar el umbral</td></tr>
+<tr><td>Una semana sin intervención</td><td>Dejar el sector 7 días</td><td>Tensión de pilas estable o subiendo; fotos todos los días; ninguna estación muda</td></tr>
+</table>
+</div>
+
+<!-- 13. MEJORAS -->
+<div class="seccion">
+<h2>13. Mejoras previstas (versión 2)</h2>
+<table>
+<tr><th>Mejora</th><th>Qué cambia</th><th>Costo</th></tr>
+<tr><td><b>XIAO ESP32S3 Sense</b> en vez de ESP32-CAM</td><td>Suma micrófono (BirdNET por audio), 8 MB de PSRAM, mejor cámara OV5640 opcional y deep sleep de microamperios con la cámara apagada de verdad. Mismo resto de la estación.</td><td>62.000 $ (<a href="https://articulo.mercadolibre.com.ar/MLA-1464391993-placa-de-desarrollo-seeed-studio-xiao-esp32-s3-sense-_JM">MLA-1464391993</a>), +37.000 $ por estación</td></tr>
+<tr><td>Regulador 3,3 V de baja caída (MCP1826 o similar) alimentando el pin 3V3</td><td>Baja el sueño del ESP32-CAM de 9 mA a unos 2,5 mA. Permite una pila y un panel por estación.</td><td>Menos de 3.000 $</td></tr>
+<tr><td>Comparación de cuadros antes de guardar</td><td>Descarta fotos donde no cambió nada (viento, insectos). Menos datos y menos trabajo de etiquetado.</td><td>Solo firmware</td></tr>
+<tr><td>Placa única con XIAO + módulo A7670SA</td><td>Reemplaza módem USB y llave por un módem de placa para una estación sola, lejos de cualquier sector.</td><td>A7670SA 95.000 a 139.000 $; alternativa LilyGO T-SIM7670G 77.999 $ (<a href="https://articulo.mercadolibre.com.ar/MLA-1958232026-modulo-t-sim-sim7670g-4g-lte-cat1-_JM">MLA-1958232026</a>, sin cámara)</td></tr>
+<tr><td>Identificación automática con BirdNET</td><td>Audio de 10 s por evento, analizado de noche en tu PC o en la PiPO; especie y confianza en la web.</td><td>Sin costo; licencia no comercial de BirdNET</td></tr>
+</table>
+
+<h2 style="margin-top:8mm">14. Referencias</h2>
+<ul class="nota">
+  <li>Bandas LTE en Argentina (B4, B7, B28): kimovil.com/es/frequency-checker/AR</li>
+  <li>BirdNET-Analyzer (Cornell Lab / Chemnitz): github.com/kahst/BirdNET-Analyzer · modelo CC BY-NC-SA 4.0</li>
+  <li>Merlin Bird ID es gratuito pero no es software libre; se usa como referencia de especies, no como componente.</li>
+  <li>ESP32-CAM: consumo en deep sleep de hasta 6 mA (ficha del vendedor y mediciones de la comunidad); pines RTC válidos para ext0: 0, 2, 4, 12, 13, 14, 15.</li>
+  <li>Publicaciones de MercadoLibre citadas en la sección 3, consultadas el 11/10/2026.</li>
+</ul>
+</div>
+
+</body>
+</html>

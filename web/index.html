@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estación Nativa — aves, árboles y datos abiertos en Del Viso</title>
+<meta name="description" content="Red de bebederos solares con cámara que registra qué aves nativas vuelven a los bosques que planta Ecoestudio Solar en Del Viso. Hardware y datos abiertos.">
+<meta property="og:title" content="Estación Nativa — aves, árboles y datos abiertos">
+<meta property="og:description" content="Bebederos solares con cámara que registran qué aves nativas vuelven a los bosques que planta Ecoestudio Solar en Del Viso. Hardware y datos abiertos.">
+<meta property="og:image" content="https://skyblue-gorilla-834934.hostingersite.com/og.png">
+<meta property="og:url" content="https://skyblue-gorilla-834934.hostingersite.com/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root { --verde:#1f5e3a; --verde-osc:#143f27; --naranja:#d9702b; --crema:#f6f1e8; --crema-2:#ece5d7; --tinta:#1b1b1b; --gris:#5f5b54; --blanco:#fff; }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: "Source Sans 3", "Segoe UI", Arial, sans-serif; color: var(--tinta); background: var(--crema); line-height: 1.55; }
+  h1, h2, h3 { font-family: Newsreader, Georgia, serif; font-weight: 700; line-height: 1.1; margin: 0 0 .5em; }
+  h1 { font-size: clamp(2.2rem, 5vw, 4rem); color: var(--verde-osc); letter-spacing: -.01em; }
+  h2 { font-size: clamp(1.7rem, 3.2vw, 2.6rem); color: var(--verde-osc); }
+  h3 { font-size: 1.2rem; color: var(--verde); }
+  p { margin: 0 0 1em; }
+  a { color: var(--verde); }
+  .contenedor { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+  .ojo { font-size: .8rem; letter-spacing: .14em; text-transform: uppercase; color: var(--naranja); font-weight: 600; margin-bottom: .8em; }
+  .boton { display: inline-block; background: var(--verde); color: #fff; padding: .85em 1.4em; border-radius: 999px; text-decoration: none; font-weight: 600; }
+  .boton.sec { background: transparent; color: var(--verde); border: 2px solid var(--verde); }
+  header { position: sticky; top: 0; z-index: 10; background: rgba(246,241,232,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--crema-2); }
+  nav { display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 16px; }
+  nav .marca { font-family: Newsreader, Georgia, serif; font-weight: 700; font-size: 1.25rem; color: var(--verde-osc); text-decoration: none; display: flex; align-items: center; gap: 10px; }
+  nav ul { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  nav ul a { text-decoration: none; color: var(--tinta); font-size: .95rem; }
+  @media (max-width: 760px) { nav ul { display: none; } }
+  section { padding: 84px 0; }
+  section.alt { background: var(--blanco); }
+  section.verde { background: var(--verde-osc); color: #efe9dc; }
+  section.verde h2, section.verde h3 { color: #fff; }
+  .hero { padding: 72px 0 60px; }
+  .hero .grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 48px; align-items: center; }
+  @media (max-width: 860px) { .hero .grid { grid-template-columns: 1fr; } }
+  .hero p.lead { font-size: 1.2rem; color: var(--gris); max-width: 32em; }
+  .acciones { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 1.4em; }
+  figure { margin: 0; }
+  figure img { width: 100%; height: auto; display: block; border-radius: 18px; }
+  figure.falta { position: relative; aspect-ratio: 4/3; max-height: 70vh; border: 2px dashed var(--naranja); border-radius: 18px; background: repeating-linear-gradient(45deg, #fff8ef, #fff8ef 12px, #fdf1e3 12px, #fdf1e3 24px); }
+  figure.falta::after { content: attr(data-falta); position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--naranja); font-weight: 600; }
+  figcaption { font-size: .85rem; color: var(--gris); margin-top: .6em; }
+  .tres { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 860px) { .tres { grid-template-columns: 1fr; } }
+  .tarjeta { background: var(--blanco); border-radius: 18px; padding: 28px; border: 1px solid var(--crema-2); }
+  section.verde .tarjeta { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+  .tarjeta .n { font-family: Newsreader, Georgia, serif; font-size: 2.4rem; color: var(--naranja); line-height: 1; margin-bottom: .3em; }
+  .pasos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 36px; }
+  @media (max-width: 860px) { .pasos { grid-template-columns: 1fr 1fr; } }
+  .paso { border-top: 3px solid var(--naranja); padding-top: 14px; }
+  .paso b { display: block; color: var(--verde-osc); margin-bottom: .3em; }
+  .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  @media (max-width: 860px) { .dos { grid-template-columns: 1fr; } }
+  ul.lista { padding-left: 0; list-style: none; }
+  ul.lista li { padding-left: 26px; position: relative; margin-bottom: .6em; }
+  ul.lista li::before { content: ""; position: absolute; left: 0; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--naranja); }
+  .piezas { display: grid; grid-template-columns: repeat(6, 1fr); gap: 16px; margin-top: 32px; }
+  @media (max-width: 860px) { .piezas { grid-template-columns: repeat(3, 1fr); } }
+  .pieza { background: var(--blanco); border-radius: 14px; padding: 14px; text-align: center; border: 1px solid var(--crema-2); }
+  .pieza img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+  .pieza span { display: block; font-size: .8rem; color: var(--gris); margin-top: 6px; }
+  .cifras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 36px; }
+  @media (max-width: 860px) { .cifras { grid-template-columns: 1fr 1fr; } }
+  .cifra b { display: block; font-family: Newsreader, Georgia, serif; font-size: 2.2rem; color: var(--naranja); line-height: 1; }
+  .cifra span { font-size: .9rem; color: inherit; opacity: .85; }
+  .sponsors { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 24px; }
+  .sponsors div { width: 150px; height: 70px; border: 2px dashed rgba(0,0,0,.18); border-radius: 10px; display: grid; place-items: center; color: var(--gris); font-size: .8rem; }
+  .formulario { background: var(--blanco); border-radius: 18px; padding: 28px; border: 1px solid var(--crema-2); margin-top: 36px; max-width: 720px; }
+  .formulario label { display: block; font-size: .9rem; color: var(--gris); margin-bottom: 14px; }
+  .formulario input, .formulario textarea { display: block; width: 100%; margin-top: 6px; padding: 10px 12px; border: 1px solid #cfc8bb; border-radius: 10px; font: inherit; color: var(--tinta); background: #fff; }
+  .formulario .campos { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .formulario .campos { grid-template-columns: 1fr; } }
+  .formulario .trampa { position: absolute; left: -9999px; }
+  .formulario .estado { margin: 12px 0 0; font-size: .95rem; color: var(--verde); }
+  .formulario .estado.error { color: #b3261e; }
+  footer { padding: 40px 0; font-size: .9rem; color: var(--gris); border-top: 1px solid var(--crema-2); }
+  footer .contenedor { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+  .equipo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 860px) { .equipo { grid-template-columns: 1fr; } }
+  .equipo .tarjeta b { display: block; font-size: 1.05rem; color: var(--verde-osc); }
+  svg text { font-family: "Source Sans 3", Arial, sans-serif; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="contenedor">
+    <a class="marca" href="#">
+      <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><circle cx="15" cy="15" r="14" fill="#1f5e3a"/><path d="M8 17c3-6 9-7 14-5-2 1-3 3-3 5-2 2-6 3-11 0z" fill="#f6f1e8"/><circle cx="19" cy="12" r="1.2" fill="#1f5e3a"/></svg>
+      Estación Nativa
+    </a>
+    <ul>
+      <li><a href="#problema">El problema</a></li>
+      <li><a href="#solucion">La solución</a></li>
+      <li><a href="#como">Cómo funciona</a></li>
+      <li><a href="#tecnologia">Tecnología</a></li>
+      <li><a href="#participar">Participar</a></li>
+    </ul>
+    <a class="boton" href="#participar">Sumarse</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="contenedor grid">
+    <div>
+      <div class="ojo">Ecoestudio Solar · Del Viso, Buenos Aires</div>
+      <h1>Los árboles vuelven. Queremos saber si las aves también.</h1>
+      <p class="lead">Estación Nativa es una red de bebederos solares con cámara que registra qué aves nativas regresan a los bosques que estamos plantando. Hardware abierto, datos abiertos, costo mínimo.</p>
+      <div class="acciones">
+        <a class="boton" href="#como">Ver cómo funciona</a>
+        <a class="boton sec" href="#participar">Apoyar el proyecto</a>
+      </div>
+    </div>
+    <figure data-falta="Render 01 · la estación al amanecer (docs/prompts-imagenes.md)">
+      <img src="img/renders/01-hero.png" alt="Estación de monitoreo junto al estanque al amanecer" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+</section>
+
+<section id="problema" class="alt">
+  <div class="contenedor">
+    <div class="ojo">El problema</div>
+    <h2>Sin monte nativo no hay aves nativas. Y sin datos, nadie sabe si están volviendo.</h2>
+    <div class="tres" style="margin-top:36px">
+      <div class="tarjeta">
+        <div class="n">1</div>
+        <h3>El monte quedó en franjas</h3>
+        <p>Los talares y montes ribereños de Buenos Aires se redujeron a restos por la agricultura, la urbanización y especies exóticas como el ligustro y la acacia negra, que ocupan el lugar de los árboles de acá pero no alimentan a la fauna local.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="n">2</div>
+        <h3>Las aves dependen de esos árboles</h3>
+        <p>Frutos, insectos y huecos para nidificar vienen de las especies que estuvieron siempre en la región. Buenos Aires figura entre las provincias con más vertebrados amenazados del país.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="n">3</div>
+        <h3>Plantar sin medir es plantar a ciegas</h3>
+        <p>Hoy no hay registros continuos de qué especies vuelven, cuándo ni a qué ritmo. El monitoreo depende de salidas esporádicas con binoculares, y quienes apoyan una plantación no pueden ver su impacto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="solucion">
+  <div class="contenedor">
+    <div class="dos">
+      <div>
+        <div class="ojo">La solución</div>
+        <h2>Plantar nativas y medir el regreso con tecnología que cabe en una mano.</h2>
+        <p>Ecoestudio Solar planta árboles nativos en Del Viso. Estación Nativa pone, en cada sector plantado, estaciones solares que dan agua y registran a cada ave que se acerca. Todo lo que registran se publica.</p>
+        <ul class="lista">
+          <li><b>Agua.</b> Un bebedero por gravedad con válvula flotante, sin energía. Es el recurso que más aves atrae, sobre todo en verano.</li>
+          <li><b>Registro.</b> Cada vez que un ave se posa, una cámara saca dos fotos con fecha, hora y lugar. En la versión 2, también graba su canto.</li>
+          <li><b>Datos abiertos.</b> Fotos, especies y horarios se publican en esta web y se comparten con eBird y con quien quiera estudiarlos.</li>
+        </ul>
+      </div>
+      <figure data-falta="Render 09 · árboles nativos jóvenes y la estación">
+        <img src="img/renders/09-arboles.png" alt="Plantación de nativas con una estación" onerror="this.parentNode.classList.add('falta');this.remove()">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="como" class="alt">
+  <div class="contenedor">
+    <div class="ojo">Cómo funciona</div>
+    <h2>Duerme casi todo el día. Se despierta cuando llega un ave.</h2>
+    <p style="max-width:40em;color:var(--gris)">La estación consume tan poco que le alcanza con un panel del tamaño de una postal. El módem 4G, que es lo que más gasta, se enciende solo seis minutos por hora y lo comparten todas las cámaras de un sector.</p>
+    <div class="pasos">
+      <div class="paso"><b>1. El ave se posa</b>En la percha o en el borde del bebedero, a 60 cm de la cámara.</div>
+      <div class="paso"><b>2. Un sensor la detecta</b>Un sensor infrarrojo despierta la estación en una fracción de segundo.</div>
+      <div class="paso"><b>3. Dos fotos</b>La cámara saca dos fotos y las guarda con fecha y hora.</div>
+      <div class="paso"><b>4. Una vez por hora</b>El sector enciende el módem 4G y sube todo lo acumulado.</div>
+      <div class="paso"><b>5. Se publica</b>La web muestra las fotos; BirdNET y observadores identifican la especie.</div>
+    </div>
+    <figure style="margin-top:40px;aspect-ratio:16/6" data-falta="Render 10 · infografía cómo funciona">
+      <img src="img/renders/10-infografia.png" alt="Infografía del funcionamiento" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+</section>
+
+<section id="sector">
+  <div class="contenedor">
+    <div class="dos">
+      <figure data-falta="Render 02 · el sector estanque con cuatro estaciones">
+        <img src="img/renders/02-estanque.png" alt="Sector estanque con varias estaciones" onerror="this.parentNode.classList.add('falta');this.remove()">
+      </figure>
+      <div>
+        <div class="ojo">El sector estanque</div>
+        <h2>Un módem, un chip, muchas cámaras.</h2>
+        <p>Las estaciones se agrupan alrededor de un punto de interés. Una de ellas lleva el módem y lo comparte por WiFi con las demás. Agregar una cámara cuesta solo la cámara.</p>
+        <ul class="lista">
+          <li><b>Todas las orillas.</b> Una cámara cubre un cono de 60 grados; con cuatro no se pierde nada.</li>
+          <li><b>Identificación más confiable.</b> Dos ángulos del mismo ave en el mismo segundo.</li>
+          <li><b>Contar, no solo detectar.</b> Disparos simultáneos distinguen una bandada de un individuo.</li>
+          <li><b>Mapa de uso.</b> Qué especie bebe en la orilla baja, cuál se baña en la parte playa, cuál usa la rama alta y a qué hora.</li>
+          <li><b>Puestos especializados.</b> Una cámara en la percha, una en el bebedero, una en el comedero y una con micrófono para toda la zona.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tecnologia" class="verde">
+  <div class="contenedor">
+    <div class="ojo">Tecnología abierta</div>
+    <h2>Piezas de catálogo, planos y código abiertos.</h2>
+    <p style="max-width:40em;opacity:.85">Nada a medida: cada componente se compra en MercadoLibre y se reemplaza en una tarde. Los planos de la caja, los esquemas, el firmware y el servidor se publican con licencias abiertas para que cualquier escuela técnica pueda armar su propio sector.</p>
+    <div class="piezas">
+      <div class="pieza"><img src="img/dispositivos/esp32-cam.webp" alt="ESP32-CAM"><span>ESP32-CAM, cerebro y cámara</span></div>
+      <div class="pieza"><img src="img/dispositivos/panel-solar-6v-1_5w.webp" alt="Panel solar"><span>Panel solar de 1,5 W</span></div>
+      <div class="pieza"><img src="img/dispositivos/bateria-18650.webp" alt="Pila 18650"><span>Pilas 18650</span></div>
+      <div class="pieza"><img src="img/dispositivos/pir-hc-sr501.webp" alt="Sensor PIR"><span>Sensor de presencia</span></div>
+      <div class="pieza"><img src="img/dispositivos/tp4056-boost-j5019.webp" alt="Cargador solar"><span>Cargador solar y fuente</span></div>
+      <div class="pieza"><img src="img/dispositivos/modem-4g-usb-wifi-2.webp" alt="Módem 4G"><span>Módem 4G compartido</span></div>
+    </div>
+    <div class="cifras">
+      <div class="cifra"><b>1,5 W</b><span>de panel por estación, el tamaño de una postal</span></div>
+      <div class="cifra"><b>20 días</b><span>de autonomía sin sol</span></div>
+      <div class="cifra"><b>6 min/h</b><span>de módem encendido, compartido por todo el sector</span></div>
+      <div class="cifra"><b>1 chip</b><span>por sector, el único costo mensual</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="datos" class="alt">
+  <div class="contenedor dos">
+    <div>
+      <div class="ojo">Datos abiertos</div>
+      <h2>Lo que vamos a aprender</h2>
+      <ul class="lista">
+        <li>Qué especies visitan cada sector, semana a semana.</li>
+        <li>A qué hora del día y en qué época del año aparecen.</li>
+        <li>Cómo cambia la lista a medida que los árboles crecen: un sector plantado hace un año contra uno de tres.</li>
+        <li>Qué recurso usa cada especie: agua, baño, percha, alimento.</li>
+      </ul>
+      <p>Las especies se confirman con BirdNET, el identificador por sonido del Cornell Lab of Ornithology, y con observadores locales. Los registros se comparten con eBird y Aves Argentinas.</p>
+    </div>
+    <figure data-falta="Render 08 · tablero web con especies y horarios">
+      <img src="img/renders/08-web.png" alt="Tablero web" onerror="this.parentNode.classList.add('falta');this.remove()">
+    </figure>
+  </div>
+</section>
+
+<section id="participar">
+  <div class="contenedor">
+    <div class="ojo">Participar</div>
+    <h2>El proyecto no tiene presupuesto. Tiene gente.</h2>
+    <p style="max-width:42em;color:var(--gris)">El diseño, el software y las horas de taller ya están. Lo que falta son los componentes de cada sector y manos para plantar, instalar y etiquetar fotos.</p>
+    <div class="tres" style="margin-top:36px">
+      <div class="tarjeta">
+        <h3>Empresas</h3>
+        <p>Apadrinar un sector completo o una estación. A cambio: logo en esta web, en la app y en el cartel del sector; un informe semestral con las fotos y las especies registradas; participación en las jornadas de plantación.</p>
+      </div>
+      <div class="tarjeta">
+        <h3>Instituciones</h3>
+        <p>Municipios, reservas, parques y escuelas pueden replicar el sistema en su propio predio con nuestro apoyo. Todo el material es abierto.</p>
+      </div>
+      <div class="tarjeta">
+        <h3>Personas</h3>
+        <p>Voluntarios para plantar e instalar, observadores de aves para validar especies, estudiantes de electrónica que quieran armar una estación.</p>
+      </div>
+    </div>
+    <div class="formulario">
+      <h3>Escribinos</h3>
+      <p>Si querés apoyar el proyecto, replicarlo o saber más, dejanos un mensaje. Lo leemos nosotros.</p>
+      <form id="form-contacto" action="api/contacto.php" method="post">
+        <input class="trampa" name="web" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="campos">
+          <label>Nombre<input name="nombre" required maxlength="80"></label>
+          <label>Correo<input type="email" name="correo" required maxlength="120"></label>
+        </div>
+        <label>Mensaje<textarea name="mensaje" rows="4" required maxlength="2000"></textarea></label>
+        <button class="boton" type="submit">Enviar</button>
+        <p class="estado" role="status"></p>
+      </form>
+    </div>
+    <h3 style="margin-top:48px">Apoyan</h3>
+    <div class="sponsors">
+      <div>Tu logo acá</div><div>Tu logo acá</div><div>Tu logo acá</div><div>Tu logo acá</div>
+    </div>
+  </div>
+</section>
+
+<section id="equipo" class="alt">
+  <div class="contenedor">
+    <div class="ojo">Quiénes</div>
+    <h2>Equipo</h2>
+    <div class="equipo" style="margin-top:28px">
+      <div class="tarjeta"><b>Iván Espeche</b>Ecoestudio Solar. Predio, plantación de nativas y vínculo con municipio, parque y vecinos.</div>
+      <div class="tarjeta"><b>Nicolás Gutiérrez</b>Diseño electrónico, firmware, servidor y app. Trabajo aportado al proyecto sin cargo.</div>
+      <div class="tarjeta"><b>Escuela técnica</b>Alumnos que desarrollan la versión educativa del comedero inteligente, origen de este proyecto.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="contenedor">
+    <div>Estación Nativa · Ecoestudio Solar · Del Viso, Buenos Aires · 2026</div>
+    <div>Hardware, software y documentación abiertos (MIT, CERN-OHL-P, CC BY-SA) · <a href="https://github.com/nik0793/estacion-nativa">github.com/nik0793/estacion-nativa</a></div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var f = document.getElementById('form-contacto');
+  if (!f) return;
+  var estado = f.querySelector('.estado');
+  var caja = f.parentNode;
+  function sinServidor() {
+    caja.innerHTML = '<h3>Contacto</h3><p>El formulario se activa con el sitio definitivo. Mientras tanto, el proyecto completo, con planos, código y presupuesto, está en <a href="https://github.com/nik0793/estacion-nativa">github.com/nik0793/estacion-nativa</a>.</p>';
+  }
+  var apiAbs = 'https://skyblue-gorilla-834934.hostingersite.com/api/contacto.php';
+  if (location.protocol === 'file:') { sinServidor(); return; }
+  fetch(f.action, { method: 'HEAD' }).then(function (r) { if (!r.ok) throw new Error('local'); })
+    .catch(function () {
+      return fetch(apiAbs, { method: 'HEAD' }).then(function (r) { if (r.ok) f.action = apiAbs; else sinServidor(); }).catch(sinServidor);
+    });
+  if (new URLSearchParams(location.search).get('gracias')) { estado.textContent = 'Gracias, recibimos tu mensaje.'; }
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var b = f.querySelector('button');
+    b.disabled = true; estado.className = 'estado'; estado.textContent = 'Enviando…';
+    fetch(f.action, { method: 'POST', body: new FormData(f), headers: { 'Accept': 'application/json' } })
+      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok && j.ok, j: j }; }); })
+      .then(function (x) {
+        if (!x.ok) throw new Error((x.j && x.j.error) || 'error');
+        f.reset(); estado.textContent = 'Gracias, recibimos tu mensaje. Te respondemos a la brevedad.';
+      })
+      .catch(function (err) { estado.className = 'estado error'; estado.textContent = 'No se pudo enviar (' + err.message + '). Probá de nuevo en un rato.'; })
+      .finally(function () { b.disabled = false; });
+  });
+})();
+</script>
+
+</body>
+</html>

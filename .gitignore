@@ -1,0 +1,18 @@
+# Credenciales y datos del servidor
+servidor/config.php
+servidor/datos/
+servidor/fotos/
+datos/
+fotos/
+
+# Copias que genera construir.ps1 (la web se arma con las imágenes de imagenes/)
+web/img/
+
+# Compilados del firmware
+firmware/**/build/
+*.bin
+*.elf
+
+# Sistema
+Thumbs.db
+.DS_Store

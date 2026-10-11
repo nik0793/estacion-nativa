@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "D:/Documentos/estacion-aves/docs/informe-tecnico.html"
+        ],
+        "createdAt": "2026-10-11T15:45:08.480Z",
+        "reason": "Claude: recuadro de aviso en un informe tecnico impreso (PDF), convencion de maquetacion de documentos, no una tarjeta de UI"
+      }
+    ]
+  }
+}
